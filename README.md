@@ -1,19 +1,19 @@
-# react-firebase-authentication
+# react-firestore-authentication
 
-[![Build Status](https://travis-ci.org/the-road-to-react-with-firebase/react-firebase-authentication.svg?branch=master)](https://travis-ci.org/the-road-to-react-with-firebase/react-firebase-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/the-road-to-react-with-firebase/react-firebase-authentication.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/the-road-to-react-with-firebase/react-firestore-authentication.svg?branch=master)](https://travis-ci.org/the-road-to-react-with-firebase/react-firestore-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/the-road-to-react-with-firebase/react-firestore-authentication.svg)](https://greenkeeper.io/)
 
-* [Tutorial](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
-* [Live Version of half of the Tutorial](https://react-firebase-authentication.wieruch.com/)
+* [Tutorial for React Firebase but not Firestore](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
+* [Live Version of half of the Tutorial](https://react-firestore-authentication.wieruch.com/)
 
 ## Features
 
 * uses:
   * only React (create-react-app)
-  * firebase 5
+  * firestore
   * react-router 4
   * no Redux/MobX
-    * [Redux Version](https://github.com/taming-the-state-in-react/react-redux-firebase-authentication)
-    * [MobX Version](https://github.com/taming-the-state-in-react/react-mobx-firebase-authentication)
+    * [Redux Version with Firebase](https://github.com/taming-the-state-in-react/react-redux-firebase-authentication)
+    * [MobX Version with Firebase](https://github.com/taming-the-state-in-react/react-mobx-firebase-authentication)
 * features:
   * Sign In
   * Sign Up
@@ -46,8 +46,8 @@ If you are creating an open source application under a license compatible with t
 
 ## Installation
 
-* `git clone git@github.com:the-road-to-react-with-firebase/react-firebase-authentication.git`
-* `cd react-firebase-authentication`
+* `git clone git@github.com:the-road-to-react-with-firebase/react-firestore-authentication.git`
+* `cd react-firestore-authentication`
 * `npm install`
 * `npm start`
 * visit http://localhost:3000/

@@ -1,5 +1,5 @@
 {
-  "name": "react-firebase-authentication",
+  "name": "react-firestore-authentication",
   "version": "0.2.0",
   "private": true,
   "dependencies": {
