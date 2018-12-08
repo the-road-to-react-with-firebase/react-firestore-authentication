@@ -14,6 +14,7 @@ class Messages extends Component {
       messages: [],
       limit: 5,
     };
+    this.unsubscribe = null;
   }
 
   componentDidMount() {
@@ -23,31 +24,29 @@ class Messages extends Component {
   onListenForMessages = () => {
     this.setState({ loading: true });
 
-    this.props.firebase
+    this.unsubscribe = this.props.firebase
       .messages()
-      .orderByChild('createdAt')
-      .limitToLast(this.state.limit)
-      .on('value', snapshot => {
-        const messageObject = snapshot.val();
+      .orderBy('createdAt', 'desc')
+      .limit(this.state.limit) // firestore doesn't have limitLast, so we use combination of order desc and limit
+      .onSnapshot(snapshot => {
+        let messages;
 
-        if (messageObject) {
-          const messageList = Object.keys(messageObject).map(key => ({
-            ...messageObject[key],
-            uid: key,
-          }));
-
-          this.setState({
-            messages: messageList,
-            loading: false,
-          });
-        } else {
-          this.setState({ messages: null, loading: false });
+        if (snapshot.size) {
+          messages = [];
+          snapshot.forEach(doc =>
+            messages.push({ ...doc.data(), uid: doc.id }),
+          );
         }
+
+        this.setState({
+          messages,
+          loading: false,
+        });
       });
   };
 
   componentWillUnmount() {
-    this.props.firebase.messages().off();
+    this.unsubscribe();
   }
 
   onChangeText = event => {
@@ -55,10 +54,10 @@ class Messages extends Component {
   };
 
   onCreateMessage = (event, authUser) => {
-    this.props.firebase.messages().push({
+    this.props.firebase.messages().add({
       text: this.state.text,
       userId: authUser.uid,
-      createdAt: this.props.firebase.serverValue.TIMESTAMP,
+      createdAt: this.props.firebase.fieldValue.serverTimestamp(),
     });
 
     this.setState({ text: '' });
@@ -67,15 +66,15 @@ class Messages extends Component {
   };
 
   onEditMessage = (message, text) => {
-    this.props.firebase.message(message.uid).set({
+    this.props.firebase.message(message.uid).update({
       ...message,
       text,
-      editedAt: this.props.firebase.serverValue.TIMESTAMP,
+      editedAt: this.props.firebase.fieldValue.serverTimestamp(),
     });
   };
 
   onRemoveMessage = uid => {
-    this.props.firebase.message(uid).remove();
+    this.props.firebase.message(uid).delete();
   };
 
   onNextPage = () => {
@@ -106,7 +105,7 @@ class Messages extends Component {
                 messages={messages.map(message => ({
                   ...message,
                   user: users
-                    ? users[message.userId]
+                    ? users[message.userId] || {}
                     : { userId: message.userId },
                 }))}
                 onEditMessage={this.onEditMessage}

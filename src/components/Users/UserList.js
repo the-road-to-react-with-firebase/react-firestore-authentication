@@ -12,28 +12,30 @@ class UserList extends Component {
       loading: false,
       users: [],
     };
+    this.unsubscribe = null;
   }
 
   componentDidMount() {
     this.setState({ loading: true });
 
-    this.props.firebase.users().on('value', snapshot => {
-      const usersObject = snapshot.val();
+    this.unsubscribe = this.props.firebase
+      .users()
+      .onSnapshot(snapshot => {
+        let users = [];
 
-      const usersList = Object.keys(usersObject).map(key => ({
-        ...usersObject[key],
-        uid: key,
-      }));
+        snapshot.forEach(doc =>
+          users.push({ ...doc.data(), uid: doc.id }),
+        );
 
-      this.setState({
-        users: usersList,
-        loading: false,
+        this.setState({
+          users,
+          loading: false,
+        });
       });
-    });
   }
 
   componentWillUnmount() {
-    this.props.firebase.users().off();
+    this.unsubscribe();
   }
 
   render() {
