@@ -24,11 +24,8 @@ class Firebase {
     /* Firebase APIs */
 
     this.auth = app.auth();
-
-    /* FireStore */
     this.db = app.firestore();
-    const settings = { timestampsInSnapshots: true};
-    this.db.settings(settings);
+    this.db.settings({ timestampsInSnapshots: true});
 
     /* Social Sign In Method Provider */
 

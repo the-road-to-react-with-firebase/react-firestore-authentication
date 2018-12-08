@@ -32,7 +32,7 @@ class UserItem extends Component {
   }
 
   componentWillUnmount() {
-    this.unsubscribe && this.unsubscribe();
+    this.unsubscribe();
   }
 
   onSendPasswordResetEmail = () => {

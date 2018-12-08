@@ -23,13 +23,13 @@ class HomePage extends Component {
         snapshot.forEach(doc => (users[doc.id] = doc.data()));
 
         this.setState({
-          users: users,
+          users,
         });
       });
   }
 
   componentWillUnmount() {
-    this.unsubscribe && this.unsubscribe();
+    this.unsubscribe();
   }
 
   render() {

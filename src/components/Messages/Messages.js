@@ -29,21 +29,24 @@ class Messages extends Component {
       .orderBy('createdAt', 'desc')
       .limit(this.state.limit) // firestore doesn't have limitLast, so we use combination of order desc and limit
       .onSnapshot(snapshot => {
-        let messageList = [];
+        let messages;
 
-        snapshot.forEach(doc =>
-          messageList.push({ ...doc.data(), uid: doc.id }),
-        );
+        if (snapshot.size) {
+          messages = [];
+          snapshot.forEach(doc =>
+            messages.push({ ...doc.data(), uid: doc.id }),
+          );
+        }
 
         this.setState({
-          messages: messageList.reverse(),
+          messages,
           loading: false,
         });
       });
   };
 
   componentWillUnmount() {
-    this.unsubscribe && this.unsubscribe();
+    this.unsubscribe();
   }
 
   onChangeText = event => {

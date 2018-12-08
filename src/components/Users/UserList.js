@@ -21,21 +21,21 @@ class UserList extends Component {
     this.unsubscribe = this.props.firebase
       .users()
       .onSnapshot(snapshot => {
-        let usersList = [];
+        let users = [];
 
         snapshot.forEach(doc =>
-          usersList.push({ ...doc.data(), uid: doc.id }),
+          users.push({ ...doc.data(), uid: doc.id }),
         );
 
         this.setState({
-          users: usersList,
+          users,
           loading: false,
         });
       });
   }
 
   componentWillUnmount() {
-    this.unsubscribe && this.unsubscribe();
+    this.unsubscribe();
   }
 
   render() {
