@@ -25,7 +25,7 @@ class Firebase {
 
     this.auth = app.auth();
     this.db = app.firestore();
-    this.db.settings({ timestampsInSnapshots: true});
+    this.db.settings({ timestampsInSnapshots: true });
 
     /* Social Sign In Method Provider */
 
@@ -71,7 +71,7 @@ class Firebase {
         this.user(authUser.uid)
           .get()
           .then(snapshot => {
-            const dbUser = snapshot.data() || {};
+            const dbUser = snapshot.data();
 
             // default empty roles
             if (!dbUser.roles) {

@@ -14,7 +14,6 @@ class Messages extends Component {
       messages: [],
       limit: 5,
     };
-    this.unsubscribe = null;
   }
 
   componentDidMount() {
@@ -27,21 +26,21 @@ class Messages extends Component {
     this.unsubscribe = this.props.firebase
       .messages()
       .orderBy('createdAt', 'desc')
-      .limit(this.state.limit) // firestore doesn't have limitLast, so we use combination of order desc and limit
+      .limit(this.state.limit)
       .onSnapshot(snapshot => {
-        let messages;
-
         if (snapshot.size) {
-          messages = [];
+          let messages = [];
           snapshot.forEach(doc =>
             messages.push({ ...doc.data(), uid: doc.id }),
           );
-        }
 
-        this.setState({
-          messages,
-          loading: false,
-        });
+          this.setState({
+            messages: messages.reverse(),
+            loading: false,
+          });
+        } else {
+          this.setState({ messages: null, loading: false });
+        }
       });
   };
 
@@ -105,7 +104,7 @@ class Messages extends Component {
                 messages={messages.map(message => ({
                   ...message,
                   user: users
-                    ? users[message.userId] || {}
+                    ? users[message.userId]
                     : { userId: message.userId },
                 }))}
                 onEditMessage={this.onEditMessage}

@@ -12,7 +12,6 @@ class HomePage extends Component {
     this.state = {
       users: null,
     };
-    this.unsubscribe = null;
   }
 
   componentDidMount() {

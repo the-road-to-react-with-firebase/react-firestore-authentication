@@ -11,7 +11,6 @@ class UserItem extends Component {
       user: null,
       ...props.location.state,
     };
-    this.unsubscribe = null;
   }
 
   componentDidMount() {
@@ -32,7 +31,7 @@ class UserItem extends Component {
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    this.unsubscribe && this.unsubscribe();
   }
 
   onSendPasswordResetEmail = () => {

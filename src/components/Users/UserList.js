@@ -12,7 +12,6 @@ class UserList extends Component {
       loading: false,
       users: [],
     };
-    this.unsubscribe = null;
   }
 
   componentDidMount() {
