@@ -44,6 +44,10 @@ It grants you also access to the other starter projects in this GitHub organizat
 
 If you are creating an open source application under a license compatible with the [GNU GPL license v3](https://www.gnu.org/licenses/gpl-3.0.html), you may use this starter project under the terms of the GPLv3.
 
+## Contributors
+
+* [Leisan Kazberova (lkazberova)](https://github.com/lkazberova)
+
 ## Installation
 
 * `git clone git@github.com:the-road-to-react-with-firebase/react-firestore-authentication.git`
