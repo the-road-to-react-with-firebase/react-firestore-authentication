@@ -18,7 +18,7 @@
 
 * uses:
   * only React (create-react-app)
-  * firestore
+  * **firestore**
   * react-router
 * features:
   * Sign In
