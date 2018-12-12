@@ -2,18 +2,24 @@
 
 [![Build Status](https://travis-ci.org/the-road-to-react-with-firebase/react-firestore-authentication.svg?branch=master)](https://travis-ci.org/the-road-to-react-with-firebase/react-firestore-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/the-road-to-react-with-firebase/react-firestore-authentication.svg)](https://greenkeeper.io/)
 
-* [Tutorial for React Firebase but not Firestore](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
+* [Tutorial for React Firebase](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
+* [React + Firestore Tutorial](https://www.robinwieruch.de/react-firestore-tutorial)
 * [Live Version of half of the Tutorial](https://react-firebase-authentication.wieruch.com/)
+
+## Variations
+
+* [Only React Version](https://github.com/the-road-to-react-with-firebase/react-firebase-authentication)
+* [Redux Version](https://github.com/the-road-to-react-with-firebase/react-redux-firebase-authentication)
+* [MobX Version](https://github.com/the-road-to-react-with-firebase/react-mobx-firebase-authentication)
+* [Gatsby Version](https://github.com/the-road-to-react-with-firebase/react-gatsby-firebase-authentication)
+* [Semantic UI Version](https://github.com/the-road-to-react-with-firebase/react-semantic-ui-firebase-authentication)
 
 ## Features
 
 * uses:
   * only React (create-react-app)
   * firestore
-  * react-router 4
-  * no Redux/MobX
-    * [Redux Version with Firebase](https://github.com/taming-the-state-in-react/react-redux-firebase-authentication)
-    * [MobX Version with Firebase](https://github.com/taming-the-state-in-react/react-mobx-firebase-authentication)
+  * react-router
 * features:
   * Sign In
   * Sign Up
