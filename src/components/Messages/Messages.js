@@ -65,10 +65,10 @@ class Messages extends Component {
   };
 
   onEditMessage = (message, text) => {
-    console.log(message);
+    const { uid, ...messageSnapshot } = message;
 
     this.props.firebase.message(message.uid).update({
-      ...message,
+      ...messageSnapshot,
       text,
       editedAt: this.props.firebase.fieldValue.serverTimestamp(),
     });
