@@ -109,7 +109,7 @@ class SignInGoogleBase extends Component {
           {
             username: socialAuthUser.user.displayName,
             email: socialAuthUser.user.email,
-            roles: [],
+            roles: {},
           },
           { merge: true },
         );
@@ -158,7 +158,7 @@ class SignInFacebookBase extends Component {
           {
             username: socialAuthUser.additionalUserInfo.profile.name,
             email: socialAuthUser.additionalUserInfo.profile.email,
-            roles: [],
+            roles: {},
           },
           { merge: true },
         );
@@ -207,7 +207,7 @@ class SignInTwitterBase extends Component {
           {
             username: socialAuthUser.additionalUserInfo.profile.name,
             email: socialAuthUser.additionalUserInfo.profile.email,
-            roles: [],
+            roles: {},
           },
           { merge: true },
         );

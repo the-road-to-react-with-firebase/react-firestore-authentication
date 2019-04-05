@@ -65,6 +65,8 @@ class Messages extends Component {
   };
 
   onEditMessage = (message, text) => {
+    console.log(message);
+
     this.props.firebase.message(message.uid).update({
       ...message,
       text,
@@ -84,7 +86,6 @@ class Messages extends Component {
   };
 
   render() {
-    const { users } = this.props;
     const { text, messages, loading } = this.state;
 
     return (
@@ -101,12 +102,8 @@ class Messages extends Component {
 
             {messages && (
               <MessageList
-                messages={messages.map(message => ({
-                  ...message,
-                  user: users
-                    ? users[message.userId]
-                    : { userId: message.userId },
-                }))}
+                authUser={authUser}
+                messages={messages}
                 onEditMessage={this.onEditMessage}
                 onRemoveMessage={this.onRemoveMessage}
               />
