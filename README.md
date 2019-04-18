@@ -116,26 +116,39 @@ REACT_APP_CONFIRMATION_EMAIL_REDIRECT=https://mydomain.com
 ### Security Rules
 
 ```
-{
-  "rules": {
-    ".read": false,
-    ".write": false,
-    "users": {
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users/'+auth.uid).child('roles').hasChildren(['ADMIN'])",
-        ".write": "$uid === auth.uid || root.child('users/'+auth.uid).child('roles').hasChildren(['ADMIN'])"
-      },
-      ".read": "root.child('users/'+auth.uid).child('roles').hasChildren(['ADMIN'])",
-      ".write": "root.child('users/'+auth.uid).child('roles').hasChildren(['ADMIN'])"
-    },
-    "messages": {
-      ".indexOn": ["createdAt"],
-      "$uid": {
-        ".write": "data.exists() ? data.child('userId').val() === auth.uid : newData.child('userId').val() === auth.uid"
-      },
-      ".read": "auth != null",
-      ".write": "auth != null",
-    },
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Custom functions
+    function signedIn() {
+        return request.auth != null;
+    }
+    
+    function isAdmin() {
+        return signedIn() &&         
+        	'ADMIN'in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.values();
+    }
+    
+    function ownsMessage() {
+        return signedIn() && request.auth.uid == resource.data.userId;
+    }
+    
+    function isSelf() {
+    	    return signedIn() && request.auth.uid == resource.id;
+    }
+    
+    // Rules
+    match /users/{userId} {
+        allow get: if isSelf();
+        allow list: if isAdmin();
+        allow write:  if isSelf() || isAdmin();
+    }
+    
+    match /messages/{messageId} {
+        allow read: if signedIn();
+        allow create: if signedIn();
+        allow update, delete: if signedIn() && ownsMessage();
+    }
   }
 }
 ```
