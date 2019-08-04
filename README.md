@@ -146,7 +146,7 @@ service cloud.firestore {
 
     match /messages/{messageId} {
         allow read: if signedIn();
-        allow create: if signedIn() && request.resource.data.userId == request.auth.uid
+        allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
         allow update, delete: if signedIn() && isOwner();
     }
   }
