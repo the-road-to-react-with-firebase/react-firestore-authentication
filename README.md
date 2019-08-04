@@ -123,31 +123,31 @@ service cloud.firestore {
     function signedIn() {
         return request.auth != null;
     }
-    
+
     function isAdmin() {
-        return signedIn() &&         
+        return signedIn() &&
         	'ADMIN'in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.values();
     }
-    
-    function ownsMessage() {
+
+    function isOwner() {
         return signedIn() && request.auth.uid == resource.data.userId;
     }
-    
+
     function isSelf() {
     	    return signedIn() && request.auth.uid == resource.id;
     }
-    
+
     // Rules
     match /users/{userId} {
-        allow get: if isSelf();
         allow list: if isAdmin();
-        allow write:  if isSelf() || isAdmin();
+    	   allow get, update, delete: if isSelf() || isAdmin();
+    	   allow create: if signedIn();
     }
-    
+
     match /messages/{messageId} {
         allow read: if signedIn();
-        allow create: if signedIn();
-        allow update, delete: if signedIn() && ownsMessage();
+        allow create: if signedIn() && request.resource.data.userId == request.auth.uid
+        allow update, delete: if signedIn() && isOwner();
     }
   }
 }
