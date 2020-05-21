@@ -4,7 +4,6 @@
 
 * [Tutorial for React Firebase](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
 * [React + Firestore Tutorial](https://www.robinwieruch.de/react-firestore-tutorial)
-* [Live Version of half of the Tutorial](https://react-firebase-authentication.wieruch.com/)
 
 ## Variations
 
