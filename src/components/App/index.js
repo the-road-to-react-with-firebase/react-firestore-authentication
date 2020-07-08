@@ -20,13 +20,8 @@ import { withAuthentication } from '../Session';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      // lightBlue and green play nicely together.
       main: '#2699FB',
     },
-    // secondary: {
-    //   // This is green.A700 as hex.
-    //   main: '#11cb5f',
-    // },
   },
 });
 
@@ -35,8 +30,6 @@ function App () {
     <Router>
       <ThemeProvider theme={theme}>
         <Header />
-
-        <hr />
 
         <Route exact path={ROUTES.LANDING} component={LandingPage} />
         <Route path={ROUTES.SIGN_UP} component={SignUpPage} />

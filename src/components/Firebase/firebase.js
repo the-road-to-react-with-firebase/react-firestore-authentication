@@ -98,6 +98,12 @@ class Firebase {
 
   users = () => this.db.collection('users');
 
+  // *** Vendor API ***
+
+  vendor = uid => this.db.doc(`vendors/${uid}`);
+
+  vendors = () => this.db.collection('vendors');
+
   // *** Message API ***
 
   message = uid => this.db.doc(`messages/${uid}`);

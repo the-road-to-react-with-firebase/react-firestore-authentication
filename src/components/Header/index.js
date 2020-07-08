@@ -1,5 +1,12 @@
 import React from 'react';
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
+
+import { AuthUserContext } from '../Session';
+import SignOutButton from '../SignOut';
+import * as ROUTES from '../../constants/routes';
+import * as ROLES from '../../constants/roles';
+
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,8 +18,9 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-
-import Navigation from '../Navigation';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
 const drawerWidth = 240;
 
@@ -26,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
+  appBarSpacer: theme.mixins.toolbar,
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
@@ -40,20 +49,11 @@ const useStyles = makeStyles((theme) => ({
   hide: {
     display: 'none',
   },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
+  list: {
+    width: 250,
   },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
+  fullList: {
+    width: 'auto',
   },
   content: {
     flexGrow: 1,
@@ -77,56 +77,91 @@ export default function Header() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const Navigation = (anchor) => (
+      <AuthUserContext.Consumer>
+        {authUser =>
+          authUser ? (
+            <NavigationAuth authUser={authUser}/>
+          ) : (
+            <NavigationNonAuth />
+          )
+        }
+      </AuthUserContext.Consumer>
+  );
+
+  const NavigationAuth = ({ authUser }) => (  
+    <ul>
+      <li>
+        <Link to={ROUTES.LANDING}>Landing</Link>
+      </li>
+      <li>
+        <Link to={ROUTES.HOME}>Home</Link>
+      </li>
+      <li>
+        <Link to={ROUTES.ACCOUNT}>Account</Link>
+      </li>
+      {!!authUser.roles[ROLES.ADMIN] && (
+        <li>
+          <Link to={ROUTES.ADMIN}>Admin</Link>
+        </li>
+      )}
+      <li>
+        <SignOutButton />
+      </li>
+    </ul>
+  );
+
+  const NavigationNonAuth = () => (
+    <ul>
+      <li>
+        <Link to={ROUTES.LANDING}>Landing</Link>
+      </li>
+      <li>
+        <Link to={ROUTES.SIGN_IN}>Sign In</Link>
+      </li>
+    </ul>
+  );
 
   return (
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
         position="fixed"
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open,
-        })}
+        className={clsx(classes.appBar)}
       >
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label="open menu"
             onClick={handleDrawerOpen}
             edge="start"
-            className={clsx(classes.menuButton, open && classes.hide)}
+            className={clsx(classes.menuButton)}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Persistent drawer
+            Food Finder
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="persistent"
-        anchor="left"
-        open={open}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <div className={classes.drawerHeader}>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </div>
-        <Divider />
+      <Drawer open={open}>
+        <div
+          className={clsx(classes.list)}
+          role="presentation"
+          onClick={handleDrawerClose}
+          onKeyDown={handleDrawerClose}
+        >
         <Navigation />
+        </div>
       </Drawer>
+      <div className={classes.appBarSpacer} />
     </div>
   );
 }

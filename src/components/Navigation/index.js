@@ -6,6 +6,7 @@ import SignOutButton from '../SignOut';
 import * as ROUTES from '../../constants/routes';
 import * as ROLES from '../../constants/roles';
 
+
 const Navigation = () => (
   <AuthUserContext.Consumer>
     {authUser =>
