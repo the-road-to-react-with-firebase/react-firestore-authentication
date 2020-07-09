@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
+    "@react-google-maps/api": "^1.9.7",
     "firebase": "^5.11.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
