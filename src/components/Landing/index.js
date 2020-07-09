@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import { GoogleMap, LoadScript, InfoWindow, Marker } from '@react-google-maps/api';
-
 import { Switch, Route } from 'react-router-dom';
 import { compose } from 'recompose';
 
