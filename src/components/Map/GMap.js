@@ -34,6 +34,7 @@ class GMap extends Component {
       calendar: [],
       loading: false,
       selected: null,
+      mapRef: null,
     };
   }
 
@@ -60,14 +61,24 @@ class GMap extends Component {
     this.unsubscribe();
   }
 
-  setSelected(marker) {
+  setSelected(marker,map) {
     this.setState({
       selected: marker,
+    });
+    if(map) {
+      map.panTo({ lat: marker.location.latitude, lng: marker.location.longitude })
+    }
+  }
+
+  onMapLoad(map) {
+    this.setState({
+      mapRef: map,
     });
   }
 
   render() {
-    const { calendar, loading, selected } = this.state;
+    const { calendar, loading, selected, mapRef } = this.state;
+
 
     return (
       <LoadScript
@@ -78,23 +89,28 @@ class GMap extends Component {
           mapContainerStyle={mapContainerStyle}
           zoom={11}
           center={center}
+          onClick={() => {
+            this.setSelected(null);
+          }}
+          onLoad={map => this.onMapLoad(map)}
         >
           {calendar.map((spot) => (
             <Marker
               key={spot.uid}
               position={{ lat: spot.location.latitude, lng: spot.location.longitude }}
               onClick={() => {
-                this.setSelected(spot);
+                this.setSelected(spot,mapRef);
               }}
             />
           ))}
           {selected ? (
             <InfoWindow
-            position={{ lat: 44.950575, lng: -93.320129 }}
-            onCloseClick ={() => {
-              this.setSelected(null);
-            }}
-          >
+              position={{ lat: 44.950575, lng: -93.320129 }}
+              options={{pixelOffset: new window.google.maps.Size(0,-40)}}
+              onCloseClick ={() => {
+                this.setSelected(null);
+              }}
+            >
               <div>
                 <h2>
                   test
