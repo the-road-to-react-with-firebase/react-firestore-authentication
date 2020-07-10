@@ -81,45 +81,62 @@ class GMap extends Component {
 
 
     return (
-      <LoadScript
-        googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
-      >
-        <GoogleMap
-          id="Food-Finder-Map"
-          mapContainerStyle={mapContainerStyle}
-          zoom={11}
-          center={center}
+      <div>
+        <button
+          className="locate"
           onClick={() => {
-            this.setSelected(null);
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                mapRef.panTo({
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                });
+              },
+              () => null
+            );
           }}
-          onLoad={map => this.onMapLoad(map)}
+        >Find My Location
+        </button>
+        <LoadScript
+          googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
         >
-          {calendar.map((spot) => (
-            <Marker
-              key={spot.uid}
-              position={{ lat: spot.location.latitude, lng: spot.location.longitude }}
-              onClick={() => {
-                this.setSelected(spot,mapRef);
-              }}
-            />
-          ))}
-          {selected ? (
-            <InfoWindow
-              position={{ lat: 44.950575, lng: -93.320129 }}
-              options={{pixelOffset: new window.google.maps.Size(0,-40)}}
-              onCloseClick ={() => {
-                this.setSelected(null);
-              }}
-            >
-              <div>
-                <h2>
-                  test
-                </h2>
-              </div>
-            </InfoWindow>
-          ) : null}
-        </GoogleMap>
-      </LoadScript>
+          <GoogleMap
+            id="Food-Finder-Map"
+            mapContainerStyle={mapContainerStyle}
+            zoom={11}
+            center={center}
+            onClick={() => {
+              this.setSelected(null);
+            }}
+            onLoad={map => this.onMapLoad(map)}
+          >
+            {calendar.map((spot) => (
+              <Marker
+                key={spot.uid}
+                position={{ lat: spot.location.latitude, lng: spot.location.longitude }}
+                onClick={() => {
+                  this.setSelected(spot,mapRef);
+                }}
+              />
+            ))}
+            {selected ? (
+              <InfoWindow
+                position={{ lat: 44.950575, lng: -93.320129 }}
+                options={{pixelOffset: new window.google.maps.Size(0,-40)}}
+                onCloseClick ={() => {
+                  this.setSelected(null);
+                }}
+              >
+                <div>
+                  <h2>
+                    test
+                  </h2>
+                </div>
+              </InfoWindow>
+            ) : null}
+          </GoogleMap>
+        </LoadScript>
+      </div>
     )
   }
 }
