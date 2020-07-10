@@ -8,6 +8,12 @@ import { Spinner } from '../Loading';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
 const mapOptions = {
   mapContainerStyle : {
     height: '100vh',
@@ -20,10 +26,15 @@ const mapOptions = {
   zoom: 11,
 }
 
-const divStyle = {
-  background: `white`,
-  border: `1px solid #ccc`,
-  padding: 15
+const timeNow = new Date();
+const calendarDefaults = {
+  startTime: timeNow,
+  endTime: timeNow.addDays(7),
+}
+
+function filterCalendarByTime(startTime, endTime) {
+  // Filters calendar events between time period and removes duplicates
+
 }
 
 class GMap extends Component {
@@ -44,6 +55,7 @@ class GMap extends Component {
 
     this.unsubscribe = this.props.firebase
       .calendar()
+      .where('end_time', '>', timeNow) // only adding calendar events that haven't ended before right now
       .onSnapshot(snapshot => {
         let calendar = [];
 

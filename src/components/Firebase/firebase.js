@@ -106,7 +106,7 @@ class Firebase {
 
   // *** Calendar API ***
 
-  calendar_spot = uid => this.db.doc(`calendar/${uid}`);
+  calendar_details = uid => this.db.doc(`calendar/${uid}`);
 
   calendar = () => this.db.collection('calendar');
 
