@@ -44,9 +44,11 @@ class GMap extends Component {
     this.state = {
       calendar: [],
       loading: false,
+      locationLoading: false,
+      infoLoading: false,
+      infoTitle: null,
       selected: null,
       mapRef: null,
-      locationLoading: false,
     };
   }
 
@@ -75,11 +77,27 @@ class GMap extends Component {
   }
 
   setSelected(marker,map) {
+
     this.setState({
       selected: marker,
+      infoLoading: true,
     });
-    if(map) {
-      map.panTo({ lat: marker.location.latitude, lng: marker.location.longitude })
+    if(marker) {
+      if(map) {
+        map.panTo({ lat: marker.location.latitude, lng: marker.location.longitude })
+      }
+
+      // Load vendor details into infoWindow
+      const vendor = this.props.firebase
+        .vendor(marker.vendor)
+        .onSnapshot(vendor => {
+          this.setState({
+            infoLoading: false,
+            infoTitle: vendor.data().name,
+          });
+        }, err => {
+          console.log('No such vendor!');
+        });
     }
   }
 
@@ -90,7 +108,15 @@ class GMap extends Component {
   }
 
   render() {
-    const { calendar, loading, locationLoading, selected, mapRef } = this.state;
+    const {
+      calendar,
+      loading,
+      locationLoading,
+      infoLoading,
+      infoTitle,
+      selected,
+      mapRef
+    } = this.state;
 
     return (
       <div>
@@ -126,6 +152,9 @@ class GMap extends Component {
             <Spinner />
           }
         </button>
+        <button>
+          Search
+        </button>
         <LoadScript
           googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
         >
@@ -157,9 +186,13 @@ class GMap extends Component {
                 }}
               >
                 <div>
-                  <h2>
-                    test
-                  </h2>
+                  {infoLoading
+                    ? <Spinner />
+                    :
+                      <h2>
+                        {infoTitle}
+                      </h2>
+                  }
                 </div>
               </InfoWindow>
             ) : null}
