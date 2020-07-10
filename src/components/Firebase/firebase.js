@@ -104,6 +104,12 @@ class Firebase {
 
   vendors = () => this.db.collection('vendors');
 
+  // *** Calendar API ***
+
+  calendar_spot = uid => this.db.doc(`calendar/${uid}`);
+
+  calendar = () => this.db.collection('calendar');
+
   // *** Message API ***
 
   message = uid => this.db.doc(`messages/${uid}`);

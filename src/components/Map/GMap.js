@@ -31,8 +31,9 @@ class GMap extends Component {
     super(props);
 
     this.state = {
+      calendar: [],
       loading: false,
-      vendors: [],
+      selected: null,
     };
   }
 
@@ -40,16 +41,16 @@ class GMap extends Component {
     this.setState({ loading: true });
 
     this.unsubscribe = this.props.firebase
-      .vendors()
+      .calendar()
       .onSnapshot(snapshot => {
-        let vendors = [];
+        let calendar = [];
 
         snapshot.forEach(doc =>
-          vendors.push({ ...doc.data(), uid: doc.id }),
+          calendar.push({ ...doc.data(), uid: doc.id }),
         );
 
         this.setState({
-          vendors,
+          calendar,
           loading: false,
         });
       });
@@ -59,7 +60,15 @@ class GMap extends Component {
     this.unsubscribe();
   }
 
+  setSelected(marker) {
+    this.setState({
+      selected: marker,
+    });
+  }
+
   render() {
+    const { calendar, loading, selected } = this.state;
+
     return (
       <LoadScript
         googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
@@ -70,20 +79,29 @@ class GMap extends Component {
           zoom={11}
           center={center}
         >
-          <Marker
-            // onClick={setSelectedVendor}
-            position={position}
+          {calendar.map((spot) => (
+            <Marker
+              key={spot.uid}
+              position={{ lat: spot.location.latitude, lng: spot.location.longitude }}
+              onClick={() => {
+                this.setSelected(spot);
+              }}
+            />
+          ))}
+          {selected ? (
+            <InfoWindow
+            position={{ lat: 44.950575, lng: -93.320129 }}
+            onCloseClick ={() => {
+              this.setSelected(null);
+            }}
           >
-            
-              <InfoWindow
-                position={position}
-              >
-                <div style={divStyle}>
-                  <h1>InfoWindow</h1>
-                </div>
-              </InfoWindow>
-          </Marker>
-
+              <div>
+                <h2>
+                  test
+                </h2>
+              </div>
+            </InfoWindow>
+          ) : null}
         </GoogleMap>
       </LoadScript>
     )
