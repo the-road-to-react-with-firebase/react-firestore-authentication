@@ -7,7 +7,7 @@ import match from 'autosuggest-highlight/match';
 
 export default function VendorSearch(props) {
   const options = props.options;
-  const [value, setValue] = React.useState('');
+  const [value, setValue] = React.useState(props.currentValue);
 
   function handleChange(event, newValue) {
     setValue(newValue);
@@ -16,7 +16,6 @@ export default function VendorSearch(props) {
   function handleInputChange(event, newValue) {
     // Handle input clear
     if(newValue === ''){
-      setValue(newValue);
       props.onChange(newValue);
     }
   }
@@ -27,12 +26,12 @@ export default function VendorSearch(props) {
       fullWidth={true}
       options={options}
       noOptionsText='No vendors found'
-      getOptionLabel={(option) => option.name}
+      getOptionLabel={option => option.name}
       value={value}
       onChange={handleChange}
       onInputChange={handleInputChange}
       renderInput={(params) => (
-        <TextField {...params} label="Search vendors" variant="outlined" margin="normal" InputProps={{ ...params.InputProps, type: 'search' }} />
+        <TextField {...params} label="Search vendors" variant="outlined" margin="normal" />
       )}
       renderOption={(option, { inputValue }) => {
         const matches = match(option.name, inputValue);

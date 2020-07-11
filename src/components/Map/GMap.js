@@ -64,6 +64,7 @@ class GMap extends Component {
       fullCalendar: [],
       loading: false,
       modalLoading: false,
+      modalLoaded: false,
       modalOpen: false,
       vendors: [],
       searchResults: [],
@@ -71,7 +72,7 @@ class GMap extends Component {
       infoLoading: false,
       infoTitle: null,
       selected: null,
-      selectedVenor: null,
+      selectedVendor: null,
       mapRef: null,
     };
   }
@@ -159,23 +160,27 @@ class GMap extends Component {
   onModalOpen = () => {
     this.setState({
       modalOpen: true,
-    })
-    this.setState({ modalLoading: true });
+    });
 
-    this.modalUnsubscribe = this.props.firebase
-      .vendors()
-      .onSnapshot(vendorsList => {
-        let vendors = [];
+    if(!this.state.modalLoaded) {
+      this.setState({ modalLoading: true });
 
-        vendorsList.forEach(doc =>
-          vendors.push({ ...doc.data(), uid: doc.id }),
-        );
+      this.modalUnsubscribe = this.props.firebase
+        .vendors()
+        .onSnapshot(vendorsList => {
+          let vendors = [];
 
-        this.setState({
-          vendors,
-          modalLoading: false,
+          vendorsList.forEach(doc =>
+            vendors.push({ ...doc.data(), uid: doc.id }),
+          );
+
+          this.setState({
+            vendors,
+            modalLoading: false,
+            modalLoaded: true,
+          });
         });
-      });
+    }
   }
   onModalClose = () => {
     this.modalUnsubscribe();
@@ -191,7 +196,7 @@ class GMap extends Component {
       // Valid vendor selected
       this.onModalClose();
       this.setState({
-        selectedVenor: selected,
+        selectedVendor: selected,
       });
       this.filterCalendarByVendor(selected.uid);
     }
@@ -203,6 +208,7 @@ class GMap extends Component {
       calendar,
       fullCalendar,
       modalLoading,
+      modalLoaded,
       modalOpen,
       vendors,
       searchResults,
@@ -211,7 +217,7 @@ class GMap extends Component {
       infoLoading,
       infoTitle,
       selected,
-      selectedVenor,
+      selectedVendor,
       mapRef
     } = this.state;
 
@@ -268,7 +274,8 @@ class GMap extends Component {
                       <p id="simple-modal-description">
                         Search by location or vendor name
                       </p>
-                      <Search options={vendors} onChange={(value) => {this.setSelectedVendor(value)}} />
+                      <Search
+                        options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
                     </div>
                     )
               }
