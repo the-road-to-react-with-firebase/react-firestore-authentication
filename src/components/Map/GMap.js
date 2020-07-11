@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
+
+import Search from '../Search';
+
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
 import { GoogleMap, LoadScript, InfoWindow, Marker } from '@react-google-maps/api';
 
@@ -50,11 +54,6 @@ const calendarDefaults = {
   endTime: timeNow.addDays(7),
 }
 
-function filterCalendarByVendor(vendor) {
-  // Filters calendar events for a specific vendor
-
-}
-
 class GMap extends Component {
   constructor(props) {
     super(props);
@@ -62,6 +61,7 @@ class GMap extends Component {
     this.state = {
       classes: useStyles,
       calendar: [],
+      fullCalendar: [],
       loading: false,
       modalLoading: false,
       modalOpen: false,
@@ -71,6 +71,7 @@ class GMap extends Component {
       infoLoading: false,
       infoTitle: null,
       selected: null,
+      selectedVenor: null,
       mapRef: null,
     };
   }
@@ -90,6 +91,7 @@ class GMap extends Component {
 
         this.setState({
           calendar,
+          fullCalendar: calendar,
           loading: false,
         });
       });
@@ -97,6 +99,30 @@ class GMap extends Component {
 
   componentWillUnmount() {
     this.unsubscribe();
+  }
+
+  filterCalendarByVendor(vendorId) {
+    // Filters calendar events for a specific vendor
+    function filterByID(item) {
+      if (item.vendor === vendorId) {
+        return true
+      } 
+      return false;
+    }
+    const result = this.state.fullCalendar.filter(filterByID);
+
+    this.setState({
+      calendar: result,
+    });
+
+    if(result.length === 1) {
+      // Set selected marker to vendor if there is only one marker
+      this.setSelected(result[0],this.state.mapRef)
+    }
+    if(result.length === 0) {
+      alert('This vendor does not have any active events.');
+    }
+
   }
 
   setSelected(marker,map) {
@@ -158,24 +184,24 @@ class GMap extends Component {
     });
   }
 
-  onSearchInput = (event) => {
-    const query = event.target.value.toLowerCase();
-    let matches = new Set();
-
-    if(query !== '') {
-      this.state.vendors.find(vendor => {
-        if(vendor.name.toLowerCase().search(query) !== -1) {
-          matches.add(vendor);
-        }
+  setSelectedVendor = (selected) => {
+    if(!selected || selected === '') {
+      this.setState({calendar: this.state.fullCalendar});
+    } else {
+      // Valid vendor selected
+      this.onModalClose();
+      this.setState({
+        selectedVenor: selected,
       });
+      this.filterCalendarByVendor(selected.uid);
     }
-    this.setState({searchResults: Array.from(matches)});
   }
 
   render() {
     const {
       classes,
       calendar,
+      fullCalendar,
       modalLoading,
       modalOpen,
       vendors,
@@ -185,6 +211,7 @@ class GMap extends Component {
       infoLoading,
       infoTitle,
       selected,
+      selectedVenor,
       mapRef
     } = this.state;
 
@@ -241,16 +268,7 @@ class GMap extends Component {
                       <p id="simple-modal-description">
                         Search by location or vendor name
                       </p>
-                      <FormControl fullWidth>
-                        <TextField id="search-input" label="Location or vendor" variant="outlined" onChange={this.onSearchInput} />
-                      </FormControl>
-                      <ul>
-                        {searchResults.map(searchResult => (
-                          <li key={searchResult.uid}>
-                            {searchResult.name}
-                          </li>
-                        ))}
-                      </ul>
+                      <Search options={vendors} onChange={(value) => {this.setSelectedVendor(value)}} />
                     </div>
                     )
               }
@@ -309,5 +327,6 @@ class GMap extends Component {
     )
   }
 }
+
 
 export default withFirebase(GMap);

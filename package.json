@@ -5,7 +5,9 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "@react-google-maps/api": "^1.9.7",
+    "autosuggest-highlight": "^3.1.1",
     "firebase": "^5.11.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
