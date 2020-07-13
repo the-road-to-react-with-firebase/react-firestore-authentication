@@ -6,11 +6,14 @@ import { styled } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import SearchIcon from '@material-ui/icons/Search';
+import EventIcon from '@material-ui/icons/Event';
 
 import Modal from '@material-ui/core/Modal';
 import Container from '@material-ui/core/Container';
 
 import Search from '../Search';
+
+import Filter from '../Filter';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -37,6 +40,19 @@ const SearchModalContainer = styled(Container)({
   padding: 30,
   backgroundColor: '#ffffff',
 });
+const FilterModal = styled(Modal)({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  padding: 30,
+});
+const FilterModalContainer = styled(Container)({
+  height: '90vh',
+  padding: 30,
+  backgroundColor: '#ffffff',
+});
 const ButtonLocate = styled(IconButton)({
   position: 'absolute',
   display: 'block',
@@ -50,6 +66,14 @@ const ButtonSearch = styled(IconButton)({
   display: 'block',
   top: headerHeight+15,
   left: headerHeight+15,
+  backgroundColor: '#ffffff',
+  border: '2px solid #2699FB',
+});
+const ButtonFilter = styled(IconButton)({
+  position: 'absolute',
+  display: 'block',
+  top: headerHeight+15,
+  left: 'calc(50% - 26px)',
   backgroundColor: '#ffffff',
   border: '2px solid #2699FB',
 });
@@ -89,6 +113,8 @@ class GMap extends Component {
       modalLoading: false,
       modalLoaded: false,
       modalOpen: false,
+      filterModalLoaded: false,
+      filterModalOpen: false,
       vendors: [],
       searchResults: [],
       locationLoading: false,
@@ -212,6 +238,18 @@ class GMap extends Component {
     });
   }
 
+  onFilterModalOpen = () => {
+    this.setState({
+      filterModalOpen: true,
+    });
+  }
+  onFilterModalClose = () => {
+    this.setState({
+      filterModalOpen: false,
+    });
+  }
+
+
   setSelectedVendor = (selected) => {
     if(!selected || selected === '') {
       this.setState({
@@ -235,6 +273,8 @@ class GMap extends Component {
       modalLoading,
       modalLoaded,
       modalOpen,
+      filterModalLoaded,
+      filterModalOpen,
       vendors,
       searchResults,
       loading,
@@ -335,22 +375,22 @@ class GMap extends Component {
         <SearchModal
           open={modalOpen}
           onClose={this.onModalClose}
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
+          aria-labelledby="modal-search-title"
+          aria-describedby="modal-search-description"
         >
           <SearchModalContainer>
-              <h2 id="simple-modal-title">Search</h2>
-              {modalLoading
-                ? <Spinner />
-                : (
-                  <div>
-                    <p id="simple-modal-description">
-                      Search by location or vendor name
-                    </p>
-                    <Search
-                      options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
-                  </div>
-                  )
+            <h2 id="modal-search-title">Search</h2>
+            {modalLoading
+              ? <Spinner />
+              : (
+                <div>
+                  <p id="modal-search-description">
+                    Search for a vendor
+                  </p>
+                  <Search
+                    options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
+                </div>
+                )
             }
             <button
               onClick={this.onModalClose}
@@ -359,6 +399,33 @@ class GMap extends Component {
             </button>
           </SearchModalContainer>
         </SearchModal>
+        <ButtonFilter
+          type="button"
+          onClick={this.onFilterModalOpen}
+          aria-label="Search"
+        >
+          <EventIcon />
+        </ButtonFilter>
+        <FilterModal
+          open={filterModalOpen}
+          aria-labelledby="modal-filter-title"
+          aria-describedby="modal-filter-description"
+        >
+          <FilterModalContainer>
+              <h2 id="modal-filter-title">Filter</h2>
+              <div>
+                <p id="modal-filter-description">
+                  Filter events
+                </p>
+                <Filter />
+              </div>
+              <button
+                onClick={this.onFilterModalClose}
+              >
+                Close
+              </button>
+          </FilterModalContainer>
+        </FilterModal>
       </div>
     )
   }
