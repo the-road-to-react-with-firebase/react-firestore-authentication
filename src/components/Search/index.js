@@ -16,6 +16,7 @@ export default function VendorSearch(props) {
   function handleInputChange(event, newValue) {
     // Handle input clear
     if(newValue === ''){
+      setValue(newValue);
       props.onChange(newValue);
     }
   }

@@ -214,7 +214,10 @@ class GMap extends Component {
 
   setSelectedVendor = (selected) => {
     if(!selected || selected === '') {
-      this.setState({calendar: this.state.fullCalendar});
+      this.setState({
+        calendar: this.state.fullCalendar,
+        selected: null,
+      });
     } else {
       // Valid vendor selected
       this.onModalClose();
