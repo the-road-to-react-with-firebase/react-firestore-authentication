@@ -8,6 +8,7 @@ import MyLocationIcon from '@material-ui/icons/MyLocation';
 import SearchIcon from '@material-ui/icons/Search';
 
 import Modal from '@material-ui/core/Modal';
+import Container from '@material-ui/core/Container';
 
 import Search from '../Search';
 
@@ -29,8 +30,12 @@ const SearchModal = styled(Modal)({
   left: 0,
   width: '100vw',
   height: '100vh',
-  backgroundColor: '#ffffff',
   padding: 30,
+});
+const SearchModalContainer = styled(Container)({
+  height: '90vh',
+  padding: 30,
+  backgroundColor: '#ffffff',
 });
 const ButtonLocate = styled(IconButton)({
   position: 'absolute',
@@ -330,7 +335,7 @@ class GMap extends Component {
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
         >
-          <div>
+          <SearchModalContainer>
               <h2 id="simple-modal-title">Search</h2>
               {modalLoading
                 ? <Spinner />
@@ -349,7 +354,7 @@ class GMap extends Component {
             >
               Close
             </button>
-          </div>
+          </SearchModalContainer>
         </SearchModal>
       </div>
     )
