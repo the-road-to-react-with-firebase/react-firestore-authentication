@@ -13,12 +13,7 @@ import * as ROUTES from '../../constants/routes';
 
 const Landing = () => (
   <div>
-    <h1>Landing</h1>
     <GMap />
-    <Switch>
-      <Route exact path={ROUTES.VENDOR_DETAILS} component={VendorItem} />
-      <Route exact path={ROUTES.LANDING} component={VendorList} />
-    </Switch>
   </div>
 );
 

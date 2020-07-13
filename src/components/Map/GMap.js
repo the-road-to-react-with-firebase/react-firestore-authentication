@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
+
+import IconButton from '@material-ui/core/IconButton';
+import MyLocationIcon from '@material-ui/icons/MyLocation';
+import SearchIcon from '@material-ui/icons/Search';
+
 import Modal from '@material-ui/core/Modal';
 
 import Search from '../Search';
@@ -17,18 +22,32 @@ import { Spinner } from '../Loading';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100vw',
-    height: '100vh',
-    backgroundColor: '#ffffff',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-  },
-}));
+const headerHeight = 48+20;
+const SearchModal = styled(Modal)({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  backgroundColor: '#ffffff',
+  padding: 30,
+});
+const ButtonLocate = styled(IconButton)({
+  position: 'absolute',
+  display: 'block',
+  top: headerHeight+15,
+  right: headerHeight+15,
+  backgroundColor: '#ffffff',
+  border: '2px solid #2699FB',
+});
+const ButtonSearch = styled(IconButton)({
+  position: 'absolute',
+  display: 'block',
+  top: headerHeight+15,
+  left: headerHeight+15,
+  backgroundColor: '#ffffff',
+  border: '2px solid #2699FB',
+});
 
 Date.prototype.addDays = function(days) {
     var date = new Date(this.valueOf());
@@ -45,7 +64,7 @@ const mapOptions = {
     lat: 44.9778,
     lng: -93.2650
   },
-  zoom: 11,
+  zoom: 10,
 }
 
 const timeNow = new Date();
@@ -59,7 +78,6 @@ class GMap extends Component {
     super(props);
 
     this.state = {
-      classes: useStyles,
       calendar: [],
       fullCalendar: [],
       loading: false,
@@ -204,7 +222,6 @@ class GMap extends Component {
 
   render() {
     const {
-      classes,
       calendar,
       fullCalendar,
       modalLoading,
@@ -223,70 +240,6 @@ class GMap extends Component {
 
     return (
       <div>
-        <button
-          className="locate"
-          onClick={() => {
-            this.setState({
-              locationLoading: true,
-            })
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const newZoom = mapOptions.zoom + 2;
-                this.setState({
-                  locationLoading: false,
-                });
-                mapRef.panTo({
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                });
-                mapRef.setZoom(newZoom);
-              },
-              () => {
-                this.setState({
-                  locationLoading: false,
-                })
-                alert('We were unable to find your current location. Please try searching for a location.');
-              }
-            );
-          }}
-        >
-          Find My Location
-          {locationLoading &&
-            <Spinner />
-          }
-        </button>
-        <div>
-          <button type="button" onClick={this.onModalOpen}>
-            Open Modal
-          </button>
-          <Modal
-            open={modalOpen}
-            onClose={this.onModalClose}
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-          >
-            <div className={classes.paper}>
-                <h2 id="simple-modal-title">Search</h2>
-                {modalLoading
-                  ? <Spinner />
-                  : (
-                    <div>
-                      <p id="simple-modal-description">
-                        Search by location or vendor name
-                      </p>
-                      <Search
-                        options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
-                    </div>
-                    )
-              }
-              <button
-                onClick={this.onModalClose}
-              >
-                Close
-              </button>
-            </div>
-          </Modal>
-        </div>
         <LoadScript
           googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
         >
@@ -330,10 +283,77 @@ class GMap extends Component {
             ) : null}
           </GoogleMap>
         </LoadScript>
+        <ButtonLocate
+          onClick={() => {
+            this.setState({
+              locationLoading: true,
+            })
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const newZoom = mapOptions.zoom + 2;
+                this.setState({
+                  locationLoading: false,
+                });
+                mapRef.panTo({
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                });
+                mapRef.setZoom(newZoom);
+              },
+              () => {
+                this.setState({
+                  locationLoading: false,
+                })
+                alert('We were unable to find your current location. Please try searching for a location.');
+              }
+            );
+          }}
+          aria-label="Find my location"
+        >
+          {locationLoading  ? (
+            <Spinner />
+            ) : (
+            <MyLocationIcon />
+            )
+          }
+        </ButtonLocate>
+        <ButtonSearch
+          type="button"
+          onClick={this.onModalOpen}
+          aria-label="Search"
+        >
+          <SearchIcon />
+        </ButtonSearch>
+        <SearchModal
+          open={modalOpen}
+          onClose={this.onModalClose}
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+        >
+          <div>
+              <h2 id="simple-modal-title">Search</h2>
+              {modalLoading
+                ? <Spinner />
+                : (
+                  <div>
+                    <p id="simple-modal-description">
+                      Search by location or vendor name
+                    </p>
+                    <Search
+                      options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
+                  </div>
+                  )
+            }
+            <button
+              onClick={this.onModalClose}
+            >
+              Close
+            </button>
+          </div>
+        </SearchModal>
       </div>
     )
   }
 }
-
 
 export default withFirebase(GMap);

@@ -33,8 +33,9 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    top: 20,
+    textAlign: 'center',
   },
-  appBarSpacer: theme.mixins.toolbar,
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
@@ -161,7 +162,6 @@ export default function Header() {
         <Navigation />
         </div>
       </Drawer>
-      <div className={classes.appBarSpacer} />
     </div>
   );
 }

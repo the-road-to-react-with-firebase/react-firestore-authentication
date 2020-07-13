@@ -20,7 +20,7 @@ export default class Spinner extends React.Component {
       <div className="spinner">
         <ClipLoader
           css={override}
-          size={30}
+          size={24}
           color={"#000000"}
           loading={this.state.loading}
         />
