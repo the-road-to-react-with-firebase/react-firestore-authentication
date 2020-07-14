@@ -79,9 +79,9 @@ const ButtonFilter = styled(IconButton)({
 });
 
 Date.prototype.addDays = function(days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
 }
 
 const mapOptions = {
@@ -115,7 +115,11 @@ class GMap extends Component {
       modalOpen: false,
       filterModalLoaded: false,
       filterModalOpen: false,
+      filteredHours: [0,24],
+      filteredHoursToggle: 'any',
+      filteredDates: [null,null],
       vendors: [],
+      vendorFilteredCalendar: [],
       searchResults: [],
       locationLoading: false,
       infoLoading: false,
@@ -151,7 +155,7 @@ class GMap extends Component {
     this.unsubscribe();
   }
 
-  filterCalendarByVendor(vendorId) {
+  filterCalendarByVendor = (vendorId) => {
     // Filters calendar events for a specific vendor
     function filterByID(item) {
       if (item.vendor === vendorId) {
@@ -161,44 +165,85 @@ class GMap extends Component {
     }
     const result = this.state.fullCalendar.filter(filterByID);
 
-    this.setState({
-      calendar: result,
-    });
+    if(this.state.filteredDates[0] || (this.state.filteredHours[0] !== 0 && this.state.filteredHours[1] !== 24)) {
+      this.setState({
+        vendorFilteredCalendar: result,
+      }, this.filterCalendarByTime(this.state.filteredDates, this.state.filteredHours));
+    } else {
+      this.setState({
+        calendar: result,
+        vendorFilteredCalendar: result,
+      });
 
-    if(result.length === 1) {
-      // Set selected marker to vendor if there is only one marker
-      this.setSelected(result[0], this.state.mapRef)
-    } else if (result.length > 1) {
-      // Check for all vendor events at same location
-      let locations = []
-
-      for (var i = result.length - 1; i >= 0; i--) {
-        let locationString = result[i].latitude + ',' + result[i].longitude;
-        if(locations.indexOf(locationString) === -1) locations.push(locationString);
-      }
-      if(locations.length === 1) {
-        // Set selected marker to vendor if there is only one location
+      if(result.length === 1) {
+        // Set selected marker to vendor if there is only one marker
         this.setSelected(result[0], this.state.mapRef)
+      } else if (result.length > 1) {
+        // Check for all vendor events at same location
+        let locations = []
+
+        for (var i = result.length - 1; i >= 0; i--) {
+          let locationString = result[i].latitude + ',' + result[i].longitude;
+          if(locations.indexOf(locationString) === -1) locations.push(locationString);
+        }
+        if(locations.length === 1) {
+          // Set selected marker to vendor if there is only one location
+          this.setSelected(result[0], this.state.mapRef)
+        } else {
+          // Multiple locations for the vendor; Don't set selected marker
+          this.setSelected(null)
+        }
       } else {
-        // Multiple locations for the vendor; Don't set selected marker
-        this.setSelected(null)
+        alert('This vendor does not have any active events.');
+      }
+    }
+
+  }
+
+  filterCalendarByTime = (dates, hours) => {
+    // Filters calendar events for specific dates and/or hours
+    let dateResults = [];
+    let filteredResults = [];
+    const currentCalendar = this.state.selectedVendor ? this.state.vendorFilteredCalendar : this.state.fullCalendar;
+console.log(this.state.selectedVendor)
+    // Date filter
+    if(dates[0]) {
+      let i = 0;
+
+      for (i = currentCalendar.length - 1; i >= 0; i--) {
+        const startDateTime = new Date(dates[0].getTime());
+        const endDateTime = new Date(dates[1].getTime());
+
+        if(startDateTime <= currentCalendar[i].end_time.toDate() && endDateTime >= currentCalendar[i].start_time.toDate().addDays(-1)) {
+          dateResults.push(currentCalendar[i]);
+        }
       }
     } else {
-      alert('This vendor does not have any active events.');
-    }
-
-  }
-
-  filterCalendarByTime(startDate, endDate, startTime, endTime) {
-    // Filters calendar events for specific dates and/or hours
-    let results = [];
-    // Date filter
-    if(startDate) {
+      dateResults = currentCalendar;
     }
     // Hours filter
+    if(hours) {
+      const currentCalendar = dateResults;
+      let i = 0;
+
+      for (i = currentCalendar.length - 1; i >= 0; i--) {
+        const currentStartHour = currentCalendar[i].start_time.toDate().getHours();
+        const currentEndHour = currentCalendar[i].end_time.toDate().getHours();
+
+        if(hours[0] < currentEndHour && hours[1] > currentStartHour) {
+          filteredResults.push(currentCalendar[i]);
+        }
+      }
+    } else {
+      filteredResults = dateResults;
+    }
+
+    if(filteredResults.length === 0) alert('No events found matching your search.');
+
+    this.setState({calendar: filteredResults});
   }
 
-  setSelected(marker,map) {
+  setSelected = (marker,map) => {
 
     this.setState({
       selected: marker,
@@ -272,22 +317,33 @@ class GMap extends Component {
     });
   }
 
+  setFilters = (hours, toggle, dates) => {
+    this.filterCalendarByTime(dates, hours);
+    this.setState({
+      filteredHours: hours,
+      filteredHoursToggle: toggle,
+      filteredDates: dates,
+      selected: null,
+    });
+    this.onFilterModalClose();
+  }
 
   setSelectedVendor = (selected) => {
     if(!selected || selected === '') {
       this.setState({
         calendar: this.state.fullCalendar,
+        vendorFilteredCalendar: [],
         selected: null,
         selectedVendor: null,
       });
     } else {
       // Valid vendor selected
-      this.onModalClose();
       this.setState({
         selected: null,
         selectedVendor: selected,
-      });
-      this.filterCalendarByVendor(selected.uid);
+      }, () => this.filterCalendarByVendor(selected.uid));
+
+      this.onModalClose();
     }
   }
 
@@ -300,6 +356,9 @@ class GMap extends Component {
       modalOpen,
       filterModalLoaded,
       filterModalOpen,
+      filteredHoursToggle,
+      filteredHours,
+      filteredDates,
       vendors,
       searchResults,
       loading,
@@ -442,13 +501,8 @@ class GMap extends Component {
                 <p id="modal-filter-description">
                   Filter events
                 </p>
-                <Filter />
+                <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
               </div>
-              <button
-                onClick={this.onFilterModalClose}
-              >
-                Close
-              </button>
           </FilterModalContainer>
         </FilterModal>
       </div>

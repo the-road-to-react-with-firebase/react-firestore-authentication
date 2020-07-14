@@ -12,6 +12,8 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Slider from '@material-ui/core/Slider';
 
+import Button from '@material-ui/core/Button';
+
 function valuetext(value) {
   let postText = 'AM';
 
@@ -28,10 +30,14 @@ function valuetext(value) {
 }
 
 export default function CalendarFilter(props) {
-  const options = props.options;
-  const [value, setValue] = React.useState([0,24]);
-  const [time, setTime] = React.useState('any');
-  const [selectedDate, handleDateChange] = React.useState([null, null]);
+  const values = props.values;
+  const [hoursValue, setHoursValue] = React.useState(values.filteredHours);
+  const [time, setTime] = React.useState(values.filteredHoursToggle);
+  const [selectedDate, handleDateChange] = React.useState(values.filteredDates);
+
+  const returnFilters = (hours, toggle, dates) => {
+    props.onChange(hours, toggle, dates);
+  }
 
   const handleToggle = (event, newTime) => {
     let newValue = [0,0];
@@ -47,18 +53,18 @@ export default function CalendarFilter(props) {
     }
 
     setTime(newTime);
-    setValue(newValue);
+    setHoursValue(newValue);
   };
 
   const handleChange = (event, newValue) => {
     setTime(null);
-    setValue(newValue);
+    setHoursValue(newValue);
   };
 
   return (
     <div>
       <FormControl>
-        <FormLabel id="hours" component="hours">Hours</FormLabel>
+        <FormLabel id="hours" component="legend">Hours</FormLabel>
         <ToggleButtonGroup
           value={time}
           exclusive
@@ -79,7 +85,7 @@ export default function CalendarFilter(props) {
           </ToggleButton>
         </ToggleButtonGroup>
         <Slider
-          value={value}
+          value={hoursValue}
           min={0}
           step={1}
           max={24}
@@ -91,7 +97,7 @@ export default function CalendarFilter(props) {
       </FormControl>
       <hr />
       <FormControl>
-        <FormLabel id="dates" component="dates">Days</FormLabel>
+        <FormLabel id="dates" component="legend">Days</FormLabel>
         <LocalizationProvider dateAdapter={DateFnsUtils}>
           <StaticDateRangePicker
             displayStaticWrapperAs="mobile"
@@ -107,6 +113,12 @@ export default function CalendarFilter(props) {
           />
         </LocalizationProvider>
       </FormControl>
+      <Button onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
+        Apply Filters
+      </Button>
+      <Button onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth variant="outlined" color="secondary">
+        Clear Filters
+      </Button>
     </div>
   );
 }
