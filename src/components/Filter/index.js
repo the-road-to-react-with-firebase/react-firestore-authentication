@@ -1,6 +1,11 @@
 /* eslint-disable no-use-before-define */
 import React from 'react';
 
+// @material-ui/pickers
+import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
+import TextField from "@material-ui/core/TextField";
+import { LocalizationProvider, StaticDateRangePicker, DateRangeDelimiter } from "@material-ui/pickers";
+
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import ToggleButton from '@material-ui/lab/ToggleButton';
@@ -26,6 +31,7 @@ export default function CalendarFilter(props) {
   const options = props.options;
   const [value, setValue] = React.useState([0,24]);
   const [time, setTime] = React.useState('any');
+  const [selectedDate, handleDateChange] = React.useState([null, null]);
 
   const handleToggle = (event, newTime) => {
     let newValue = [0,0];
@@ -45,41 +51,62 @@ export default function CalendarFilter(props) {
   };
 
   const handleChange = (event, newValue) => {
+    setTime(null);
     setValue(newValue);
   };
 
   return (
-    <FormControl component="fieldset">
-      <FormLabel id="legend" component="legend">Hours</FormLabel>
-      <ToggleButtonGroup
-        value={time}
-        exclusive
-        onChange={handleToggle}
-        aria-label="select time"
-      >
-        <ToggleButton value='any' aria-label="left aligned">
-          Anytime
-        </ToggleButton>
-        <ToggleButton value='breakfast' aria-label="centered">
-          Breakfast
-        </ToggleButton>
-        <ToggleButton value='lunch' aria-label="right aligned">
-          Lunch
-        </ToggleButton>
-        <ToggleButton value='dinner' aria-label="justified">
-          Dinner
-        </ToggleButton>
-      </ToggleButtonGroup>
-      <Slider
-        value={value}
-        min={0}
-        step={1}
-        max={24}
-        onChange={handleChange}
-        valueLabelDisplay="on"
-        aria-labelledby="legend"
-        valueLabelFormat={valuetext}
-      />
-    </FormControl>
+    <div>
+      <FormControl>
+        <FormLabel id="hours" component="hours">Hours</FormLabel>
+        <ToggleButtonGroup
+          value={time}
+          exclusive
+          onChange={handleToggle}
+          aria-label="select time"
+        >
+          <ToggleButton value='any' aria-label="left aligned">
+            Anytime
+          </ToggleButton>
+          <ToggleButton value='breakfast' aria-label="centered">
+            Breakfast
+          </ToggleButton>
+          <ToggleButton value='lunch' aria-label="right aligned">
+            Lunch
+          </ToggleButton>
+          <ToggleButton value='dinner' aria-label="justified">
+            Dinner
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Slider
+          value={value}
+          min={0}
+          step={1}
+          max={24}
+          onChange={handleChange}
+          valueLabelDisplay="on"
+          aria-labelledby="legend"
+          valueLabelFormat={valuetext}
+        />
+      </FormControl>
+      <hr />
+      <FormControl>
+        <FormLabel id="dates" component="dates">Days</FormLabel>
+        <LocalizationProvider dateAdapter={DateFnsUtils}>
+          <StaticDateRangePicker
+            displayStaticWrapperAs="mobile"
+            value={selectedDate}
+            onChange={date => handleDateChange(date)}
+            renderInput={(startProps, endProps) => (
+              <React.Fragment>
+                <TextField {...startProps} />
+                <DateRangeDelimiter> to </DateRangeDelimiter>
+                <TextField {...endProps} />
+              </React.Fragment>
+            )}
+          />
+        </LocalizationProvider>
+      </FormControl>
+    </div>
   );
 }
