@@ -255,6 +255,7 @@ class GMap extends Component {
       this.setState({
         calendar: this.state.fullCalendar,
         selected: null,
+        selectedVendor: null,
       });
     } else {
       // Valid vendor selected
