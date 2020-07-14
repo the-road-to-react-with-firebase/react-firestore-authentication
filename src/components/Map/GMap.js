@@ -5,6 +5,9 @@ import { styled } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
 
+import Popover from '@material-ui/core/Popover';
+
+import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import SearchIcon from '@material-ui/icons/Search';
@@ -60,6 +63,9 @@ const ButtonGrid = styled(Grid)({
   top: headerHeight+15,
   textAlign: 'center',
 })
+const RefreshPopover = styled(Popover)({
+  margin: '0 auto',
+})
 const ButtonLocate = styled(IconButton)({
   margin: '0 auto',
   display: 'block',
@@ -111,10 +117,10 @@ class GMap extends Component {
       calendar: [],
       fullCalendar: [],
       loading: false,
+      refresh: false,
       modalLoading: false,
       modalLoaded: false,
       modalOpen: false,
-      filterModalLoaded: false,
       filterModalOpen: false,
       filterSet: false,
       filteredHours: [0,24],
@@ -145,16 +151,43 @@ class GMap extends Component {
           calendar.push({ ...doc.data(), uid: doc.id }),
         );
 
-        this.setState({
-          calendar,
-          fullCalendar: calendar,
-          loading: false,
-        });
+        if(this.state.loading) {
+          this.setState({
+            calendar,
+            fullCalendar: calendar,
+            loading: false,
+          });
+        } else {
+          this.setState({
+            refresh: true,
+            fullCalendar: calendar,
+          });
+        }
+
       });
   }
 
   componentWillUnmount() {
     this.unsubscribe();
+  }
+
+  refreshMap = () => {
+    this.setState({
+      calendar: this.state.fullCalendar,
+      refresh: false,
+      filterSet: false,
+      filteredHours: [0,24],
+      filteredHoursToggle: 'any',
+      filteredDates: [null,null],
+      modalLoaded: false,
+      vendors: [],
+      vendorFilteredCalendar: [],
+      searchResults: [],
+      infoLoading: false,
+      infoTitle: null,
+      selected: null,
+      selectedVendor: null,
+    })
   }
 
   filterCalendarByVendor = (vendorId) => {
@@ -358,10 +391,10 @@ class GMap extends Component {
     const {
       calendar,
       fullCalendar,
+      refresh,
       modalLoading,
       modalLoaded,
       modalOpen,
-      filterModalLoaded,
       filterModalOpen,
       filteredHoursToggle,
       filteredHours,
@@ -534,6 +567,14 @@ class GMap extends Component {
             </ButtonLocate>
             Find My Location
           </Grid>
+          {refresh &&
+            <Grid item xs={12}>
+              <Button onClick={this.refreshMap}>
+                Events Updated. Refresh map
+              </Button>
+            </Grid>
+          }
+          
         </ButtonGrid>
       </div>
     )
