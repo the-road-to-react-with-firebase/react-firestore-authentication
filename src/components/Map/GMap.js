@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@material-ui/core/styles';
 
+import Grid from '@material-ui/core/Grid';
+
 import IconButton from '@material-ui/core/IconButton';
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import SearchIcon from '@material-ui/icons/Search';
@@ -53,27 +55,26 @@ const FilterModalContainer = styled(Container)({
   padding: 30,
   backgroundColor: '#ffffff',
 });
-const ButtonLocate = styled(IconButton)({
+const ButtonGrid = styled(Grid)({
   position: 'absolute',
-  display: 'block',
   top: headerHeight+15,
-  right: headerHeight+15,
+  textAlign: 'center',
+})
+const ButtonLocate = styled(IconButton)({
+  margin: '0 auto',
+  display: 'block',
   backgroundColor: '#ffffff',
   border: '2px solid #2699FB',
 });
 const ButtonSearch = styled(IconButton)({
-  position: 'absolute',
+  margin: '0 auto',
   display: 'block',
-  top: headerHeight+15,
-  left: headerHeight+15,
   backgroundColor: '#ffffff',
   border: '2px solid #2699FB',
 });
 const ButtonFilter = styled(IconButton)({
-  position: 'absolute',
+  margin: '0 auto',
   display: 'block',
-  top: headerHeight+15,
-  left: 'calc(50% - 26px)',
   backgroundColor: '#ffffff',
   border: '2px solid #2699FB',
 });
@@ -115,6 +116,7 @@ class GMap extends Component {
       modalOpen: false,
       filterModalLoaded: false,
       filterModalOpen: false,
+      filterSet: false,
       filteredHours: [0,24],
       filteredHoursToggle: 'any',
       filteredDates: [null,null],
@@ -205,7 +207,7 @@ class GMap extends Component {
     let dateResults = [];
     let filteredResults = [];
     const currentCalendar = this.state.selectedVendor ? this.state.vendorFilteredCalendar : this.state.fullCalendar;
-console.log(this.state.selectedVendor)
+
     // Date filter
     if(dates[0]) {
       let i = 0;
@@ -318,11 +320,16 @@ console.log(this.state.selectedVendor)
   }
 
   setFilters = (hours, toggle, dates) => {
+    let filterStatus = false;
+    if(dates[0] || (hours[0] !== 0 && hours[1] !== 24)) {
+      filterStatus = true;
+    }
     this.filterCalendarByTime(dates, hours);
     this.setState({
       filteredHours: hours,
       filteredHoursToggle: toggle,
       filteredDates: dates,
+      filterSet: filterStatus,
       selected: null,
     });
     this.onFilterModalClose();
@@ -359,6 +366,7 @@ console.log(this.state.selectedVendor)
       filteredHoursToggle,
       filteredHours,
       filteredDates,
+      filterSet,
       vendors,
       searchResults,
       loading,
@@ -415,96 +423,118 @@ console.log(this.state.selectedVendor)
             ) : null}
           </GoogleMap>
         </LoadScript>
-        <ButtonLocate
-          onClick={() => {
-            this.setState({
-              locationLoading: true,
-            })
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const newZoom = mapOptions.zoom + 2;
-                this.setState({
-                  locationLoading: false,
-                });
-                mapRef.panTo({
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                });
-                mapRef.setZoom(newZoom);
-              },
-              () => {
-                this.setState({
-                  locationLoading: false,
-                })
-                alert('We were unable to find your current location. Please try searching for a location.');
-              }
-            );
-          }}
-          aria-label="Find my location"
-        >
-          {locationLoading  ? (
-            <Spinner />
-            ) : (
-            <MyLocationIcon />
-            )
-          }
-        </ButtonLocate>
-        <ButtonSearch
-          type="button"
-          onClick={this.onModalOpen}
-          aria-label="Search"
-        >
-          <SearchIcon />
-        </ButtonSearch>
-        <SearchModal
-          open={modalOpen}
-          onClose={this.onModalClose}
-          aria-labelledby="modal-search-title"
-          aria-describedby="modal-search-description"
-        >
-          <SearchModalContainer>
-            <h2 id="modal-search-title">Search</h2>
-            {modalLoading
-              ? <Spinner />
-              : (
-                <div>
-                  <p id="modal-search-description">
-                    Search for a vendor
-                  </p>
-                  <Search
-                    options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
-                </div>
-                )
-            }
-            <button
-              onClick={this.onModalClose}
+        <ButtonGrid container spacing={3}>
+          <Grid item xs={4}>
+            <ButtonSearch
+              type="button"
+              onClick={this.onModalOpen}
+              aria-label="Search"
             >
-              Close
-            </button>
-          </SearchModalContainer>
-        </SearchModal>
-        <ButtonFilter
-          type="button"
-          onClick={this.onFilterModalOpen}
-          aria-label="Search"
-        >
-          <EventIcon />
-        </ButtonFilter>
-        <FilterModal
-          open={filterModalOpen}
-          aria-labelledby="modal-filter-title"
-          aria-describedby="modal-filter-description"
-        >
-          <FilterModalContainer>
-              <h2 id="modal-filter-title">Filter</h2>
-              <div>
-                <p id="modal-filter-description">
-                  Filter events
-                </p>
-                <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
-              </div>
-          </FilterModalContainer>
-        </FilterModal>
+              <SearchIcon />
+            </ButtonSearch>
+            {selectedVendor
+              ?
+                <span>{selectedVendor.name}</span>
+              :
+                <span>Search Vendors</span>
+            }
+            <SearchModal
+              open={modalOpen}
+              onClose={this.onModalClose}
+              aria-labelledby="modal-search-title"
+              aria-describedby="modal-search-description"
+            >
+              <SearchModalContainer>
+                <h2 id="modal-search-title">Search</h2>
+                {modalLoading
+                  ? <Spinner />
+                  : (
+                    <div>
+                      <p id="modal-search-description">
+                        Search for a vendor
+                      </p>
+                      <Search
+                        options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
+                    </div>
+                    )
+                }
+                <button
+                  onClick={this.onModalClose}
+                >
+                  Close
+                </button>
+              </SearchModalContainer>
+            </SearchModal>
+          </Grid>
+          <Grid item xs={4}>
+            <ButtonFilter
+              type="button"
+              onClick={this.onFilterModalOpen}
+              aria-label="Search"
+            >
+              <EventIcon />
+            </ButtonFilter>
+
+            {filterSet
+              ?
+                <span>Filter applied</span>
+              :
+                <span>Filter by Date or Time</span>
+            }
+            <FilterModal
+              open={filterModalOpen}
+              aria-labelledby="modal-filter-title"
+              aria-describedby="modal-filter-description"
+            >
+              <FilterModalContainer>
+                  <h2 id="modal-filter-title">Filter</h2>
+                  <div>
+                    <p id="modal-filter-description">
+                      Filter events
+                    </p>
+                    <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
+                  </div>
+              </FilterModalContainer>
+            </FilterModal>
+          </Grid>
+          <Grid item xs={4}>
+            <ButtonLocate
+              onClick={() => {
+                this.setState({
+                  locationLoading: true,
+                })
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    const newZoom = mapOptions.zoom + 2;
+                    this.setState({
+                      locationLoading: false,
+                    });
+                    mapRef.panTo({
+                      lat: position.coords.latitude,
+                      lng: position.coords.longitude,
+                    });
+                    mapRef.setZoom(newZoom);
+                  },
+                  () => {
+                    this.setState({
+                      locationLoading: false,
+                    })
+                    alert('We were unable to find your current location. Please try searching for a location.');
+                  }
+                );
+              }}
+              aria-label="Find my location"
+            >
+              {locationLoading  ? (
+                <Spinner />
+                ) : (
+                <MyLocationIcon />
+                )
+              }
+            </ButtonLocate>
+            Find My Location
+          </Grid>
+        </ButtonGrid>
       </div>
     )
   }
