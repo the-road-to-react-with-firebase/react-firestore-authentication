@@ -167,12 +167,35 @@ class GMap extends Component {
 
     if(result.length === 1) {
       // Set selected marker to vendor if there is only one marker
-      this.setSelected(result[0],this.state.mapRef)
-    }
-    if(result.length === 0) {
+      this.setSelected(result[0], this.state.mapRef)
+    } else if (result.length > 1) {
+      // Check for all vendor events at same location
+      let locations = []
+
+      for (var i = result.length - 1; i >= 0; i--) {
+        let locationString = result[i].latitude + ',' + result[i].longitude;
+        if(locations.indexOf(locationString) === -1) locations.push(locationString);
+      }
+      if(locations.length === 1) {
+        // Set selected marker to vendor if there is only one location
+        this.setSelected(result[0], this.state.mapRef)
+      } else {
+        // Multiple locations for the vendor; Don't set selected marker
+        this.setSelected(null)
+      }
+    } else {
       alert('This vendor does not have any active events.');
     }
 
+  }
+
+  filterCalendarByTime(startDate, endDate, startTime, endTime) {
+    // Filters calendar events for specific dates and/or hours
+    let results = [];
+    // Date filter
+    if(startDate) {
+    }
+    // Hours filter
   }
 
   setSelected(marker,map) {
@@ -261,6 +284,7 @@ class GMap extends Component {
       // Valid vendor selected
       this.onModalClose();
       this.setState({
+        selected: null,
         selectedVendor: selected,
       });
       this.filterCalendarByVendor(selected.uid);
