@@ -187,7 +187,9 @@ class GMap extends Component {
       infoTitle: null,
       selected: null,
       selectedVendor: null,
-    })
+    });
+    this.state.mapRef.panTo(mapOptions.center)
+    this.state.mapRef.setZoom(mapOptions.zoom);
   }
 
   filterCalendarByVendor = (vendorId) => {
