@@ -490,14 +490,15 @@ class GMap extends Component {
                       </p>
                       <Search
                         options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
+                      <Button onClick={this.onModalClose} fullWidth variant="contained" color="primary">
+                        Find Vendor
+                      </Button>
+                      <Button onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
+                        Clear Search
+                      </Button>
                     </div>
                     )
                 }
-                <button
-                  onClick={this.onModalClose}
-                >
-                  Close
-                </button>
               </SearchModalContainer>
             </SearchModal>
           </Grid>

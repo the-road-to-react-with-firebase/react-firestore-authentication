@@ -116,7 +116,7 @@ export default function CalendarFilter(props) {
       <Button onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
         Apply Filters
       </Button>
-      <Button onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth variant="outlined" color="secondary">
+      <Button onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth>
         Clear Filters
       </Button>
     </div>
