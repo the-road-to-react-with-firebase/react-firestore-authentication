@@ -223,7 +223,7 @@ class GMap extends Component {
     if(this.state.filteredDates[0] || (this.state.filteredHours[0] !== 0 && this.state.filteredHours[1] !== 24)) {
       this.setState({
         vendorFilteredCalendar: result,
-      }, this.filterCalendarByTime(this.state.filteredDates, this.state.filteredHours));
+      }, () => this.filterCalendarByTime(this.state.filteredDates, this.state.filteredHours)); // Rerun date filters
     } else {
       this.setState({
         calendar: result,
@@ -260,11 +260,12 @@ class GMap extends Component {
     let dateResults = [];
     let filteredResults = [];
     const currentCalendar = this.state.selectedVendor ? this.state.vendorFilteredCalendar : this.state.fullCalendar;
+
     // Date filter
     if(dates[0]) {
       let i = 0;
       const startDateFilter = new Date(dates[0].getTime());
-      const endDateFilter = new Date(dates[1].getTime());
+      const endDateFilter = (!endDateFilter) ? startDateFilter : new Date(dates[1].getTime());
       const filterDays = getDaysInRange(startDateFilter, endDateFilter);
       for (i = currentCalendar.length - 1; i >= 0; i--) {
         if(currentCalendar[i].recurring) {
@@ -411,6 +412,11 @@ class GMap extends Component {
         vendorFilteredCalendar: [],
         selected: null,
         selectedVendor: null,
+      }, () => {
+        if(this.state.filteredDates[0] || (this.state.filteredHours[0] !== 0 && this.state.filteredHours[1] !== 24)) {
+          // Rerun date filters
+          this.filterCalendarByTime(this.state.filteredDates, this.state.filteredHours);
+        }
       });
     } else {
       // Valid vendor selected
