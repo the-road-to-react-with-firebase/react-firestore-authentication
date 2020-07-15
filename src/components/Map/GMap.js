@@ -161,6 +161,7 @@ class GMap extends Component {
 
     this.unsubscribe = this.props.firebase
       .calendar()
+      .orderBy('end_time')
       .where('end_time', '>', timeNow) // only adding calendar events that haven't ended before right now
       .onSnapshot(snapshot => {
         let calendar = [];
@@ -356,6 +357,7 @@ class GMap extends Component {
 
       const vendorsFirestore = this.props.firebase
         .vendors()
+        .orderBy('name')
         .get()
         .then(vendorsList => {
           let vendors = [];
