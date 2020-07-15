@@ -23,6 +23,11 @@ import Filter from '../Filter';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+
+import DirectionsIcon from '@material-ui/icons/Directions';
+import PhoneIcon from '@material-ui/icons/Phone';
+import ScheduleIcon from '@material-ui/icons/Schedule';
 
 import { GoogleMap, LoadScript, InfoWindow, Marker } from '@react-google-maps/api';
 
@@ -108,6 +113,15 @@ function getDaysInRange(startDate, endDate) {
   return days;
 }
 
+function formatPhoneNumber(phoneNumberString) {
+  var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
+  var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/)
+  if (match) {
+    return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+  }
+  return null
+}
+
 
 const mapOptions = {
   mapContainerStyle : {
@@ -149,7 +163,16 @@ class GMap extends Component {
       searchResults: [],
       locationLoading: false,
       infoLoading: false,
-      infoTitle: null,
+      infoData: {
+        events: [],
+        title: null,
+        address: null,
+        phone: null,
+        website: null,
+        menu: null,
+        instagram: null,
+        facebook: null,
+      },
       selected: null,
       selectedVendor: null,
       mapRef: null,
@@ -203,7 +226,16 @@ class GMap extends Component {
       vendorFilteredCalendar: [],
       searchResults: [],
       infoLoading: false,
-      infoTitle: null,
+      infoData: {
+        events: [],
+        title: null,
+        address: null,
+        phone: null,
+        website: null,
+        menu: null,
+        instagram: null,
+        facebook: null,
+      },
       selected: null,
       selectedVendor: null,
     });
@@ -316,12 +348,33 @@ class GMap extends Component {
     this.setState({calendar: filteredResults});
   }
 
-  setSelected = (marker,map) => {
+  getCalendarEventsAtLocation = (location) => {
+    function filterByLocation(item) {
+      if (item.location.latitude === location.latitude && item.location.longitude === location.longitude) {
+        return true
+      } 
+      return false;
+    }
+    // Using current calendar with vendor search and fitlers applied
+    return this.state.calendar.filter(filterByLocation);
+  }
 
+  openDirections = (location) => {
+    // Opens google maps directions in new window with specified location as the endpoint
+    window.open('https://www.google.com/maps/dir/?api=1&destination='+location.latitude+','+location.longitude);
+  }
+
+  isOpen = (event) => {
+    let now = new Date();
+    return (now < event.end_time.toDate() && now > event.start_time.toDate());
+  }
+
+  setSelected = (marker, map) => {
     this.setState({
       selected: marker,
       infoLoading: true,
     });
+
     if(marker) {
       if(map) {
         map.panTo({ lat: marker.location.latitude, lng: marker.location.longitude })
@@ -331,9 +384,17 @@ class GMap extends Component {
       const vendor = this.props.firebase
         .vendor(marker.vendor)
         .onSnapshot(vendor => {
+          let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
+
           this.setState({
             infoLoading: false,
-            infoTitle: vendor.data().name,
+            infoData: {
+              title: vendor.data().name,
+              address: vendorEvents[0].address,
+              phone: formatPhoneNumber(vendor.data().phone),
+              isOpen: this.isOpen(vendorEvents[0]),
+              events: vendorEvents,
+            }
           });
         }, err => {
           console.log('No such vendor!');
@@ -449,7 +510,7 @@ class GMap extends Component {
       loading,
       locationLoading,
       infoLoading,
-      infoTitle,
+      infoData,
       selected,
       selectedVendor,
       mapRef
@@ -483,7 +544,7 @@ class GMap extends Component {
               <InfoWindow
                 position={{ lat: selected.location.latitude, lng: selected.location.longitude }}
                 options={{pixelOffset: new window.google.maps.Size(0,-40)}}
-                onCloseClick ={() => {
+                onCloseClick={() => {
                   this.setSelected(null);
                 }}
               >
@@ -491,9 +552,39 @@ class GMap extends Component {
                   {infoLoading
                     ? <Spinner />
                     :
+                    <div>
                       <h2>
-                        {infoTitle}
+                        {infoData.title}
                       </h2>
+                      <List>
+                        <ListItem key="address" button onClick={() => this.openDirections(infoData.events[0].location)}>
+                          <ListItemIcon>
+                            <DirectionsIcon />
+                          </ListItemIcon>
+                          <ListItemText primary={infoData.address} />
+                        </ListItem>
+                        {infoData.phone &&
+                          <ListItem key="phone" button onClick={() => window.open('tel:' + infoData.phone)}>
+                            <ListItemIcon>
+                              <PhoneIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={infoData.phone} />
+                          </ListItem>
+                        }
+
+                          <ListItem key="hours">
+                            <ListItemIcon>
+                              <ScheduleIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={infoData.isOpen ? 'Open now' : 'Closed'} />
+                          </ListItem>
+                      </List>
+                      {infoData.events.map((calEvent) => (
+
+                        <div key={calEvent.uid}>{calEvent.uid}</div>
+
+                      ))}
+                    </div>
                   }
                 </div>
               </InfoWindow>
