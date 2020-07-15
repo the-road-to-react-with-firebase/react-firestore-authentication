@@ -90,6 +90,24 @@ Date.prototype.addDays = function(days) {
   date.setDate(date.getDate() + days);
   return date;
 }
+function getDaysInRange(startDate, endDate) {
+  let days = [];
+  let i = 0;
+  const daysSelected = ((endDate - startDate) / 1000/60/60/24);
+
+  if(daysSelected >= 7) days = [0,1,2,3,4,5,6];
+  else if(daysSelected <= 1) days = [startDate.getDay()]
+  else {
+    do {
+      days.push(startDate.addDays(i).getDay());
+      i++;
+    }
+    while (i <= daysSelected);
+  }
+
+  return days;
+}
+
 
 const mapOptions = {
   mapContainerStyle : {
@@ -242,33 +260,49 @@ class GMap extends Component {
     let dateResults = [];
     let filteredResults = [];
     const currentCalendar = this.state.selectedVendor ? this.state.vendorFilteredCalendar : this.state.fullCalendar;
-
     // Date filter
     if(dates[0]) {
       let i = 0;
-
+      const startDateFilter = new Date(dates[0].getTime());
+      const endDateFilter = new Date(dates[1].getTime());
+      const filterDays = getDaysInRange(startDateFilter, endDateFilter);
       for (i = currentCalendar.length - 1; i >= 0; i--) {
-        const startDateTime = new Date(dates[0].getTime());
-        const endDateTime = new Date(dates[1].getTime());
-
-        if(startDateTime <= currentCalendar[i].end_time.toDate() && endDateTime >= currentCalendar[i].start_time.toDate().addDays(-1)) {
-          dateResults.push(currentCalendar[i]);
+        if(currentCalendar[i].recurring) {
+          // Check if some of event days are within filter range
+          if(
+            ((currentCalendar[i].recurring_start.toDate() >= startDateFilter) && (currentCalendar[i].recurring_start.toDate() <= endDateFilter)) ||
+            ((currentCalendar[i].recurring_end.toDate() >=startDateFilter) && (currentCalendar[i].recurring_end.toDate() <= endDateFilter))) {
+              // Filter recurring events by the days of the week selected in the date filter
+              let r = 0;
+              
+              for (r = currentCalendar[i].days.length - 1; r >= 0; r--) {
+                if(filterDays.includes(currentCalendar[i].days[r])) {
+                  dateResults.push(currentCalendar[i]);
+                  r = -1;
+                } 
+              }
+          }
+        } else {
+           if(startDateFilter <= currentCalendar[i].end_time.toDate() && endDateFilter >= currentCalendar[i].start_time.toDate().addDays(-1)) {
+            dateResults.push(currentCalendar[i]);
+          }
         }
       }
     } else {
       dateResults = currentCalendar;
     }
+
     // Hours filter
     if(hours) {
-      const currentCalendar = dateResults;
+      const tempCalendar = dateResults;
       let i = 0;
 
-      for (i = currentCalendar.length - 1; i >= 0; i--) {
-        const currentStartHour = currentCalendar[i].start_time.toDate().getHours();
-        const currentEndHour = currentCalendar[i].end_time.toDate().getHours();
+      for (i = tempCalendar.length - 1; i >= 0; i--) {
+        const currentStartHour = tempCalendar[i].start_time.toDate().getHours();
+        const currentEndHour = tempCalendar[i].end_time.toDate().getHours();
 
         if(hours[0] < currentEndHour && hours[1] > currentStartHour) {
-          filteredResults.push(currentCalendar[i]);
+          filteredResults.push(tempCalendar[i]);
         }
       }
     } else {
@@ -276,7 +310,7 @@ class GMap extends Component {
     }
 
     if(filteredResults.length === 0) alert('No events found matching your search.');
-
+    
     this.setState({calendar: filteredResults});
   }
 
