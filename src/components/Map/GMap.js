@@ -354,9 +354,10 @@ class GMap extends Component {
     if(!this.state.modalLoaded) {
       this.setState({ modalLoading: true });
 
-      this.modalUnsubscribe = this.props.firebase
+      const vendorsFirestore = this.props.firebase
         .vendors()
-        .onSnapshot(vendorsList => {
+        .get()
+        .then(vendorsList => {
           let vendors = [];
 
           vendorsList.forEach(doc =>
@@ -372,7 +373,6 @@ class GMap extends Component {
     }
   }
   onModalClose = () => {
-    this.modalUnsubscribe();
     this.setState({
       modalOpen: false,
     });
