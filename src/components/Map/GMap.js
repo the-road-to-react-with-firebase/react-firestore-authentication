@@ -37,6 +37,7 @@ import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 
 const headerHeight = 48+20;
+const headerButtonsHeight = headerHeight + 96;
 const SearchModal = styled(Modal)({
   position: 'absolute',
   top: 0,
@@ -298,7 +299,7 @@ class GMap extends Component {
     if(dates[0]) {
       let i = 0;
       const startDateFilter = new Date(dates[0].getTime());
-      const endDateFilter = (!endDateFilter) ? startDateFilter : new Date(dates[1].getTime());
+      const endDateFilter = (!dates[1]) ? startDateFilter : new Date(dates[1].getTime());
       const filterDays = getDaysInRange(startDateFilter, endDateFilter);
       for (i = currentCalendar.length - 1; i >= 0; i--) {
         if(currentCalendar[i].recurring) {
@@ -377,7 +378,8 @@ class GMap extends Component {
 
     if(marker) {
       if(map) {
-        map.panTo({ lat: marker.location.latitude, lng: marker.location.longitude })
+        map.panTo({ lat: marker.location.latitude, lng: marker.location.longitude });
+        map.panBy(0, -headerButtonsHeight);
       }
 
       // Load vendor details into infoWindow
