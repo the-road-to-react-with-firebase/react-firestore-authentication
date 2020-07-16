@@ -690,6 +690,7 @@ class GMap extends Component {
           <Grid item xs={4}>
             <ButtonLocate
               onClick={() => {
+                this.props.firebase.analytics.logEvent('find_location');
                 this.setState({
                   locationLoading: true,
                 })
