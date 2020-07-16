@@ -115,6 +115,18 @@ function getDaysInRange(startDate, endDate) {
 
   return days;
 }
+function getDayString(dayValue) {
+  let weekday=new Array(7);
+  weekday[0]="Sunday";
+  weekday[1]="Monday";
+  weekday[2]="Tuesday";
+  weekday[3]="Wednesday";
+  weekday[4]="Thursday";
+  weekday[5]="Friday";
+  weekday[6]="Saturday";
+
+  return weekday[dayValue];
+}
 
 function formatPhoneNumber(phoneNumberString) {
   var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
@@ -166,20 +178,7 @@ class GMap extends Component {
       searchResults: [],
       locationLoading: false,
       infoLoading: false,
-      infoData: {
-        nextEvent: [],
-        isOpen: false,
-        events: [],
-        nextEvent: [],
-        isOpen: false,
-        title: null,
-        address: null,
-        phone: null,
-        website: null,
-        menu: null,
-        instagram: null,
-        facebook: null,
-      },
+      infoData: {},
       selected: null,
       selectedVendor: null,
       mapRef: null,
@@ -201,6 +200,7 @@ class GMap extends Component {
         );
 
         if(this.state.loading) {
+          this.setNewBounds(calendar);
           this.setState({
             calendar,
             fullCalendar: calendar,
@@ -233,18 +233,7 @@ class GMap extends Component {
       vendorFilteredCalendar: [],
       searchResults: [],
       infoLoading: false,
-      infoData: {
-        events: [],
-        nextEvent: [],
-        isOpen: false,
-        title: null,
-        address: null,
-        phone: null,
-        website: null,
-        menu: null,
-        instagram: null,
-        facebook: null,
-      },
+      infoData: {},
       selected: null,
       selectedVendor: null,
     });
@@ -407,8 +396,19 @@ class GMap extends Component {
         .vendor(marker.vendor)
         .onSnapshot(vendor => {
           let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
+          let nextEventDays = '';
+          let firstDay = true;
 
-          console.log(vendorEvents[0].start_time.toDate())
+          if(vendorEvents[0].recurring) {
+            vendorEvents[0].days.map(day => {
+              if(firstDay) {
+                nextEventDays += getDayString(day) + 's';
+                firstDay = false;
+              } else {
+                nextEventDays += ', ' + getDayString(day) + 's';
+              }
+            });
+          }
 
           this.setState({
             selected: marker,
@@ -419,6 +419,7 @@ class GMap extends Component {
               phone: formatPhoneNumber(vendor.data().phone),
               isOpen: this.isOpen(vendorEvents[0]),
               nextEvent: vendorEvents[0],
+              nextEventDays: nextEventDays,
               events: vendorEvents,
             }
           });
@@ -617,13 +618,21 @@ class GMap extends Component {
                           <ListItemIcon>
                             <EventIcon />
                           </ListItemIcon>
-                          <ListItemText
-                            primary={ format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do') }
-                            secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
-                          />
+                          {infoData.nextEvent.recurring
+                            ? 
+                              <ListItemText
+                                primary={infoData.nextEventDays}
+                                secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
+                              />
+                            :
+                              <ListItemText
+                                primary={ format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do') }
+                                secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
+                              />
+                          }
                         </ListItem>
                         {infoData.events.length > 1 &&
-                          <ListItem key="hours">
+                          <ListItem key="calendar">
                             <ListItemIcon>
                             </ListItemIcon>
                             <ListItemText
