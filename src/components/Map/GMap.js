@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
+import { format, formatRelative } from 'date-fns';
+
 import { styled } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
@@ -165,7 +167,11 @@ class GMap extends Component {
       locationLoading: false,
       infoLoading: false,
       infoData: {
+        nextEvent: [],
+        isOpen: false,
         events: [],
+        nextEvent: [],
+        isOpen: false,
         title: null,
         address: null,
         phone: null,
@@ -229,6 +235,8 @@ class GMap extends Component {
       infoLoading: false,
       infoData: {
         events: [],
+        nextEvent: [],
+        isOpen: false,
         title: null,
         address: null,
         phone: null,
@@ -400,6 +408,8 @@ class GMap extends Component {
         .onSnapshot(vendor => {
           let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
 
+          console.log(vendorEvents[0].start_time.toDate())
+
           this.setState({
             selected: marker,
             infoLoading: false,
@@ -408,6 +418,7 @@ class GMap extends Component {
               address: vendorEvents[0].address,
               phone: formatPhoneNumber(vendor.data().phone),
               isOpen: this.isOpen(vendorEvents[0]),
+              nextEvent: vendorEvents[0],
               events: vendorEvents,
             }
           });
@@ -592,19 +603,36 @@ class GMap extends Component {
                             <ListItemText primary={infoData.phone} />
                           </ListItem>
                         }
-
+                        <ListItem key="open">
+                          <ListItemIcon>
+                            <ScheduleIcon />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={infoData.isOpen ? 'Open now' : 'Closed'}
+                            secondary={(infoData.isOpen ? (format(infoData.nextEvent.start_time.toDate(), 'p') + format(infoData.nextEvent.end_time.toDate(), ' - p')) : ('Opens ' + formatRelative(infoData.nextEvent.start_time.toDate(), timeNow))) }
+                            className={infoData.isOpen ? 'text-open' : 'text-closed'}
+                          />
+                        </ListItem>
+                        <ListItem key="hours">
+                          <ListItemIcon>
+                            <EventIcon />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={ format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do') }
+                            secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
+                          />
+                        </ListItem>
+                        {infoData.events.length > 1 &&
                           <ListItem key="hours">
                             <ListItemIcon>
-                              <ScheduleIcon />
                             </ListItemIcon>
-                            <ListItemText primary={infoData.isOpen ? 'Open now' : 'Closed'} />
+                            <ListItemText
+                              primary={infoData.events.length + ' events at this location'}
+                              secondary='View all dates and times'
+                            />
                           </ListItem>
+                        }
                       </List>
-                      {infoData.events.map((calEvent) => (
-
-                        <div key={calEvent.uid}>{calEvent.uid}</div>
-
-                      ))}
                     </div>
                   }
                 </div>
