@@ -264,9 +264,11 @@ class GMap extends Component {
         vendorFilteredCalendar: result,
       });
 
+      this.setNewBounds(result);
+
       if(result.length === 1) {
         // Set selected marker to vendor if there is only one marker
-        this.setSelected(result[0], this.state.mapRef)
+        this.setSelected(result[0])
       } else if (result.length > 1) {
         // Check for all vendor events at same location
         let locations = []
@@ -277,7 +279,7 @@ class GMap extends Component {
         }
         if(locations.length === 1) {
           // Set selected marker to vendor if there is only one location
-          this.setSelected(result[0], this.state.mapRef)
+          this.setSelected(result[0])
         } else {
           // Multiple locations for the vendor; Don't set selected marker
           this.setSelected(null)
@@ -345,8 +347,10 @@ class GMap extends Component {
     }
 
     if(filteredResults.length === 0) alert('No events found matching your search.');
+    if(filteredResults.length === 1) this.setSelected(filteredResults[0]);
     
     this.setState({calendar: filteredResults});
+    this.setNewBounds(filteredResults);
   }
 
   getCalendarEventsAtLocation = (location) => {
@@ -370,17 +374,25 @@ class GMap extends Component {
     return (now < event.end_time.toDate() && now > event.start_time.toDate());
   }
 
-  setSelected = (marker, map) => {
-    this.setState({
-      selected: marker,
-      infoLoading: true,
-    });
+  setNewBounds = (markers) => {
+    // Sets map bounds to contain markers
+    const bounds = new window.google.maps.LatLngBounds();
+    var i = markers.length - 1;
 
+    for (i; i >= 0; i--) {
+      bounds.extend({lat: markers[i].location.latitude, lng: markers[i].location.longitude});
+    }
+
+    this.state.mapRef.fitBounds(bounds);
+  }
+
+  setSelected = (marker) => {
     if(marker) {
-      if(map) {
-        map.panTo({ lat: marker.location.latitude, lng: marker.location.longitude });
-        map.panBy(0, -headerButtonsHeight);
-      }
+      this.setState({
+        infoLoading: true,
+      });
+      this.state.mapRef.panTo({ lat: marker.location.latitude, lng: marker.location.longitude });
+      this.state.mapRef.panBy(0, -headerButtonsHeight);
 
       // Load vendor details into infoWindow
       const vendor = this.props.firebase
@@ -389,6 +401,7 @@ class GMap extends Component {
           let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
 
           this.setState({
+            selected: marker,
             infoLoading: false,
             infoData: {
               title: vendor.data().name,
@@ -401,6 +414,10 @@ class GMap extends Component {
         }, err => {
           console.log('No such vendor!');
         });
+    } else {
+      this.setState({
+        selected: null,
+      });
     }
   }
 
@@ -481,6 +498,8 @@ class GMap extends Component {
         if(this.state.filteredDates[0] || (this.state.filteredHours[0] !== 0 && this.state.filteredHours[1] !== 24)) {
           // Rerun date filters
           this.filterCalendarByTime(this.state.filteredDates, this.state.filteredHours);
+        } else {
+          this.setNewBounds(this.state.calendar);
         }
       });
     } else {
@@ -538,7 +557,7 @@ class GMap extends Component {
                 key={spot.uid}
                 position={{ lat: spot.location.latitude, lng: spot.location.longitude }}
                 onClick={() => {
-                  this.setSelected(spot,mapRef);
+                  this.setSelected(spot);
                 }}
               />
             ))}
