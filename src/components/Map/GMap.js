@@ -156,6 +156,11 @@ const mapOptions = {
     lng: -93.2650
   },
   zoom: 10,
+  options: {
+    maxZoom: 18.5,
+    mapTypeControl: false,
+    gestureHandling: 'greedy',
+  }
 }
 
 const timeNow = new Date();
@@ -613,6 +618,7 @@ class GMap extends Component {
             id="Food-Finder-Map"
             mapContainerStyle={mapOptions.mapContainerStyle}
             zoom={mapOptions.zoom}
+            options={mapOptions.options}
             center={mapOptions.center}
             onClick={() => {
               this.setSelected(null);
