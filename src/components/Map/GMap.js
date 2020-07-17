@@ -46,10 +46,9 @@ const SearchModal = styled(Modal)({
   left: 0,
   width: '100vw',
   height: '100vh',
-  padding: 30,
 });
 const SearchModalContainer = styled(Container)({
-  height: '90vh',
+  height: '100vh',
   padding: 30,
   backgroundColor: '#ffffff',
 });
@@ -59,10 +58,9 @@ const FilterModal = styled(Modal)({
   left: 0,
   width: '100vw',
   height: '100vh',
-  padding: 30,
 });
 const FilterModalContainer = styled(Container)({
-  height: '90vh',
+  height: '100vh',
   padding: 30,
   backgroundColor: '#ffffff',
 });
@@ -760,14 +758,10 @@ class GMap extends Component {
             <FilterModal
               open={filterModalOpen}
               aria-labelledby="modal-filter-title"
-              aria-describedby="modal-filter-description"
             >
               <FilterModalContainer>
                   <h2 id="modal-filter-title">Filter</h2>
                   <div>
-                    <p id="modal-filter-description">
-                      Filter events
-                    </p>
                     <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
                   </div>
               </FilterModalContainer>
@@ -776,13 +770,15 @@ class GMap extends Component {
           <Grid item xs={4}>
             <ButtonLocate
               onClick={() => {
-                this.props.firebase.analytics.logEvent('find_location');
+                this.props.firebase.analytics.logEvent('location_detect');
                 this.setState({
                   locationLoading: true,
                 })
                 navigator.geolocation.getCurrentPosition(
                   (position) => {
                     const newZoom = mapOptions.zoom + 2;
+
+                    this.props.firebase.analytics.logEvent('location_found', { position: position});
                     this.setState({
                       locationLoading: false,
                     });
@@ -796,7 +792,7 @@ class GMap extends Component {
                     this.setState({
                       locationLoading: false,
                     })
-                    alert('We were unable to find your current location. Please try searching for a location.');
+                    alert('We were unable to find your current location.');
                   }
                 );
               }}

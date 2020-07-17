@@ -100,6 +100,8 @@ export default function CalendarFilter(props) {
         <FormLabel id="dates" component="legend">Days</FormLabel>
         <LocalizationProvider dateAdapter={DateFnsUtils}>
           <StaticDateRangePicker
+            disablePast
+            showToolbar={false}
             displayStaticWrapperAs="mobile"
             value={selectedDate}
             onChange={date => handleDateChange(date)}
