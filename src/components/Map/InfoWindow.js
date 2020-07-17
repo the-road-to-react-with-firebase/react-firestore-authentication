@@ -45,7 +45,7 @@ export default function InfoWindow(props) {
 
   return (
     <div ref={observed}>
-      <Typography variant="h4" component="h2">
+      <Typography variant="h5" component="h2">
         {infoData.title}
       </Typography>
       <List>
