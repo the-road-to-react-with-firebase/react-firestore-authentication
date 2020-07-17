@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-
-import { format, formatRelative } from 'date-fns';
 
 import { styled } from '@material-ui/core/styles';
 
@@ -15,6 +12,8 @@ import MyLocationIcon from '@material-ui/icons/MyLocation';
 import SearchIcon from '@material-ui/icons/Search';
 import EventIcon from '@material-ui/icons/Event';
 
+import { InfoWindow as InfoWindowVendor } from '../Map';
+
 import Typography from '@material-ui/core/Typography';
 
 import Modal from '@material-ui/core/Modal';
@@ -24,44 +23,21 @@ import Search from '../Search';
 
 import Filter from '../Filter';
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-
-import DirectionsIcon from '@material-ui/icons/Directions';
-import PhoneIcon from '@material-ui/icons/Phone';
-import ScheduleIcon from '@material-ui/icons/Schedule';
-
 import { GoogleMap, LoadScript, InfoWindow, Marker } from '@react-google-maps/api';
 
 import { Spinner } from '../Loading';
 
 import { withFirebase } from '../Firebase';
-import * as ROUTES from '../../constants/routes';
 
 const headerHeight = 48+20;
-const headerButtonsHeight = headerHeight + 96;
-const SearchModal = styled(Modal)({
+const FullModal = styled(Modal)({
   position: 'absolute',
   top: 0,
   left: 0,
   width: '100vw',
   height: '100vh',
 });
-const SearchModalContainer = styled(Container)({
-  height: '100vh',
-  padding: 30,
-  backgroundColor: '#ffffff',
-});
-const FilterModal = styled(Modal)({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100vw',
-  height: '100vh',
-});
-const FilterModalContainer = styled(Container)({
+const FullModalContainer = styled(Container)({
   height: '100vh',
   padding: 30,
   backgroundColor: '#ffffff',
@@ -70,9 +46,6 @@ const ButtonGrid = styled(Grid)({
   position: 'absolute',
   top: headerHeight+15,
   textAlign: 'center',
-});
-const RefreshPopover = styled(Popover)({
-  margin: '0 auto',
 });
 const TopButton = styled(IconButton)({
   margin: '0 auto',
@@ -145,7 +118,6 @@ function formatPhoneNumber(phoneNumberString) {
   return null
 }
 
-
 const mapOptions = {
   mapContainerStyle : {
     height: '100vh',
@@ -203,8 +175,8 @@ class GMap extends Component {
 
     this.unsubscribe = this.props.firebase
       .calendar()
-      .orderBy('end_time')
-      .where('end_time', '>', timeNow) // only adding calendar events that haven't ended before right now
+      // Todo: need to add some filters and limits if we get too many events
+      .orderBy('start_time')
       .onSnapshot(snapshot => {
         let calendar = [];
 
@@ -374,11 +346,6 @@ class GMap extends Component {
     return this.state.calendar.filter(filterByLocation);
   }
 
-  openDirections = (location) => {
-    // Opens google maps directions in new window with specified location as the endpoint
-    window.open('https://www.google.com/maps/dir/?api=1&destination='+location.latitude+','+location.longitude);
-  }
-
   isOpen = (event) => {
     let now = new Date();
 
@@ -407,7 +374,6 @@ class GMap extends Component {
         infoLoading: true,
       });
       this.state.mapRef.panTo({ lat: marker.location.latitude, lng: marker.location.longitude });
-      this.state.mapRef.panBy(0, -headerButtonsHeight);
 
       // Load vendor details into infoWindow
       const vendor = this.props.firebase
@@ -416,14 +382,16 @@ class GMap extends Component {
           let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
           let nextEventDays = '';
           let firstDay = true;
+          let nextEvent = vendorEvents[0];
+          console.log(vendorEvents)
 
-          if(vendorEvents[0].recurring) {
+          if(nextEvent.recurring) {
             const today = new Date();
             const todayDay = today.getDay();
-            const startDate = vendorEvents[0].start_time.toDate();
+            const startDate = nextEvent.start_time.toDate();
             const startHour = startDate.getHours();
             const startMinutes = startDate.getMinutes();
-            const endDate = vendorEvents[0].end_time.toDate();
+            const endDate = nextEvent.end_time.toDate();
             const endHour = endDate.getHours();
             const endMinutes = endDate.getMinutes();
             let newStart = new Date();
@@ -434,7 +402,7 @@ class GMap extends Component {
             // Set start_time and end_time of next recurring event (closest to today)
             // Go through event days array starting at index of todayDay
             do {
-              let eventDay = (vendorEvents[0].days.indexOf(checkDay) != -1) ? vendorEvents[0].days[vendorEvents[0].days.indexOf(checkDay)] : null;
+              let eventDay = (nextEvent.days.indexOf(checkDay) != -1) ? nextEvent.days[nextEvent.days.indexOf(checkDay)] : null;
 
               if((eventDay === todayDay) && ((today.getHours() + today.getMinutes()*.01) < (endHour + endMinutes*.01))) {
                 // Happening today and hasn't ended yet - keep newStart and newEnd value of today
@@ -449,18 +417,18 @@ class GMap extends Component {
             } while(checkDay < 7 && !dateSet);
             if(!dateSet) {
               // If recurring day is less than today, add 7 - today day value + recurring day value for next event day
-              newStart = newStart.addDays(7 - todayDay + vendorEvents[0].days[0]); // First recurring day in array is next event day
-              newEnd = newEnd.addDays(7 - todayDay + vendorEvents[0].days[0]);
+              newStart = newStart.addDays(7 - todayDay + nextEvent.days[0]); // First recurring day in array is next event day
+              newEnd = newEnd.addDays(7 - todayDay + nextEvent.days[0]);
             }
 
             newStart.setHours(startHour);
             newStart.setMinutes(startMinutes);
-            vendorEvents[0].start_time = new this.props.firebase.firestore.Timestamp.fromDate(newStart);
+            nextEvent.start_time = new this.props.firebase.firestore.Timestamp.fromDate(newStart);
             newEnd.setHours(endHour);
             newEnd.setMinutes(endMinutes);
-            vendorEvents[0].end_time = new this.props.firebase.firestore.Timestamp.fromDate(newEnd);
+            nextEvent.end_time = new this.props.firebase.firestore.Timestamp.fromDate(newEnd);
             // Create plain text recurring days string
-            vendorEvents[0].days.map(day => {
+            nextEvent.days.map(day => {
               if(firstDay) {
                 nextEventDays += getDayString(day) + 's';
                 firstDay = false;
@@ -468,6 +436,7 @@ class GMap extends Component {
                 nextEventDays += ', ' + getDayString(day) + 's';
               }
             });
+            nextEvent['daysString'] = nextEventDays;
           }
 
           this.setState({
@@ -475,11 +444,10 @@ class GMap extends Component {
             infoLoading: false,
             infoData: {
               title: vendor.data().name,
-              address: vendorEvents[0].address,
+              address: nextEvent.address,
               phone: formatPhoneNumber(vendor.data().phone),
-              isOpen: this.isOpen(vendorEvents[0]),
-              nextEvent: vendorEvents[0],
-              nextEventDays: nextEventDays,
+              isOpen: this.isOpen(nextEvent),
+              nextEvent: nextEvent,
               events: vendorEvents,
             }
           });
@@ -645,65 +613,11 @@ class GMap extends Component {
                 <div>
                   {infoLoading
                     ? <Spinner />
-                    :
-                    <div>
-                      <h2>
-                        {infoData.title}
-                      </h2>
-                      <List>
-                        <ListItem key="address" button onClick={() => this.openDirections(infoData.events[0].location)}>
-                          <ListItemIcon>
-                            <DirectionsIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={infoData.address} />
-                        </ListItem>
-                        {infoData.phone &&
-                          <ListItem key="phone" button onClick={() => window.open('tel:' + infoData.phone)}>
-                            <ListItemIcon>
-                              <PhoneIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={infoData.phone} />
-                          </ListItem>
-                        }
-                        <ListItem key="open">
-                          <ListItemIcon>
-                            <ScheduleIcon />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={infoData.isOpen ? 'Open now' : 'Closed'}
-                            secondary={(infoData.isOpen ? (format(infoData.nextEvent.start_time.toDate(), 'p') + format(infoData.nextEvent.end_time.toDate(), ' - p')) : ('Opens ' + formatRelative(infoData.nextEvent.start_time.toDate(), timeNow))) }
-                            className={infoData.isOpen ? 'text-open' : 'text-closed'}
-                          />
-                        </ListItem>
-                        <ListItem key="hours">
-                          <ListItemIcon>
-                            <EventIcon />
-                          </ListItemIcon>
-                          {infoData.nextEvent.recurring
-                            ? 
-                              <ListItemText
-                                primary={infoData.nextEventDays}
-                                secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
-                              />
-                            :
-                              <ListItemText
-                                primary={ format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do') }
-                                secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
-                              />
-                          }
-                        </ListItem>
-                        {infoData.events.length > 1 &&
-                          <ListItem key="calendar">
-                            <ListItemIcon>
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={(infoData.events.length-1) + ' other event' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
-                              secondary='View all dates and times'
-                            />
-                          </ListItem>
-                        }
-                      </List>
-                    </div>
+                    : <InfoWindowVendor
+                        infoData={infoData}
+                        modal={FullModal}
+                        modalContainer={FullModalContainer}
+                        onRender={(height) => {this.state.mapRef.panBy(0, (-height/2 - headerHeight))}} />
                   }
                 </div>
               </InfoWindow>
@@ -723,13 +637,13 @@ class GMap extends Component {
             <ButtonText selected={selectedVendor}>
             {selectedVendor ? selectedVendor.name : 'Search Vendors' }
             </ButtonText>
-            <SearchModal
+            <FullModal
               open={modalOpen}
               onClose={this.onModalClose}
               aria-labelledby="modal-search-title"
               aria-describedby="modal-search-description"
             >
-              <SearchModalContainer>
+              <FullModalContainer>
                 <h2 id="modal-search-title">Search</h2>
                 {modalLoading
                   ? <Spinner />
@@ -749,8 +663,8 @@ class GMap extends Component {
                     </div>
                     )
                 }
-              </SearchModalContainer>
-            </SearchModal>
+              </FullModalContainer>
+            </FullModal>
           </Grid>
           <Grid item xs={4}>
             <TopButton
@@ -764,17 +678,17 @@ class GMap extends Component {
             <ButtonText selected={filterSet}>
             {filterSet ? 'Filter Applied' : 'Search Vendors' }
             </ButtonText>
-            <FilterModal
+            <FullModal
               open={filterModalOpen}
               aria-labelledby="modal-filter-title"
             >
-              <FilterModalContainer>
+              <FullModalContainer>
                   <h2 id="modal-filter-title">Filter</h2>
                   <div>
                     <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
                   </div>
-              </FilterModalContainer>
-            </FilterModal>
+              </FullModalContainer>
+            </FullModal>
           </Grid>
           <Grid item xs={4}>
             <TopButton
