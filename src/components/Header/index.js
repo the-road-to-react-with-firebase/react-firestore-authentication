@@ -22,36 +22,35 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
-const drawerWidth = 240;
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
   appBar: {
+    color: '#2699FB',
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    top: 20,
-    textAlign: 'center',
+    top: 10,
+    backgroundColor: 'rgba(235, 245, 254, 0.96)',
+    boxShadow: 'none',
   },
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+  title: {
+    margin: '0 auto',
+    textTransform: 'uppercase',
+    fontFamily: 'Arial Rounded MT Bold,Helvetica Rounded,Arial,sans-serif',
+    fontSize: '1.1rem',
   },
   menuButton: {
-    marginRight: theme.spacing(2),
+    left: theme.spacing(2),
+    position: 'absolute',
   },
   hide: {
     display: 'none',
   },
   list: {
-    width: 250,
+    width: '100vw',
   },
   fullList: {
     width: 'auto',
@@ -63,7 +62,6 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth,
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
@@ -147,8 +145,8 @@ export default function Header() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
-            Food Finder
+          <Typography variant="h5" component="h1" noWrap className={clsx(classes.title)}>
+            Fair Food Finder
           </Typography>
         </Toolbar>
       </AppBar>
