@@ -24,35 +24,58 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Slider from '@material-ui/core/Slider';
 import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
+import Divider from '@material-ui/core/Divider';
+
 import Button from '@material-ui/core/Button';
+
+import Container from '@material-ui/core/Container';
 
 const Label = withStyles({
   root: {
     paddingLeft: 0,
-    marginBottom: 5,
+    marginBottom: 0,
     marginTop: 0,
+    color: '#2699FB',
   },
 })(ListItem);
 const LabelIcon = withStyles({
   root: {
-    minWidth: 30,  
+    minWidth: 30,
+    color: '#2699FB',
   },
 })(ListItemIcon);
 
 const StyledValueLabel = withStyles({
   circle: {
-    width: 40,
-    height: 40,
+    width: 46,
+    height: 46,
   },
   label: {
     color: '#ffffff',
+    fontWeight: 500,
   }
 })(ValueLabel);
+
+const SliderContainer =  withStyles({
+  root: {
+    margin: '40px 0 0',
+  }
+})(Container);
+
+const ButtonGroup =  withStyles({
+  root: {
+    display: 'flex',
+    marginBottom: 20,
+    '& button': {
+      display: 'flex',
+      flexGrow: 1,
+    },
+  },
+})(ToggleButtonGroup);
 
 const HoursSlider = withStyles({
   root: {
     height: 6,
-    margin: '50px 20px',
   },
   thumb: {
     height: 24,
@@ -67,8 +90,8 @@ const HoursSlider = withStyles({
   },
   active: {},
   valueLabel: {
-    left: -10,
-    top: -40,
+    left: -13,
+    top: -46,
   },
   track: {
     height: 8,
@@ -82,7 +105,7 @@ const HoursSlider = withStyles({
 
 const Actions = withStyles({
   root: {
-    margin: '8px 0',
+    margin: '6px 0',
   },
 })(Button);
 
@@ -117,11 +140,11 @@ export default function CalendarFilter(props) {
     if(newTime === 'any') {
       newValue = [0,24];
     } else if(newTime === 'breakfast') {
-      newValue = [5,11];
+      newValue = [5,10];
     } else if(newTime === 'lunch') {
       newValue = [11,15];
     } else if(newTime === 'dinner') {
-      newValue = [16,22];
+      newValue = [17,21];
     }
 
     setTime(newTime);
@@ -135,14 +158,26 @@ export default function CalendarFilter(props) {
 
   return (
     <div>
-      <FormControl>
+      <FormControl fullWidth>
         <Label component="h3">
           <LabelIcon>
             <ScheduleIcon />
           </LabelIcon>
           <ListItemText primary="Hours" />
         </Label>
-        <ToggleButtonGroup
+        <SliderContainer>
+          <HoursSlider
+            value={hoursValue}
+            min={0}
+            step={1}
+            max={24}
+            onChange={handleChange}
+            valueLabelDisplay="on"
+            ValueLabelComponent={StyledValueLabel}
+            valueLabelFormat={valuetext}
+          />
+        </SliderContainer>
+        <ButtonGroup
           value={time}
           exclusive
           onChange={handleToggle}
@@ -160,17 +195,8 @@ export default function CalendarFilter(props) {
           <ToggleButton value='dinner' aria-label="justified">
             Dinner
           </ToggleButton>
-        </ToggleButtonGroup>
-        <HoursSlider
-          value={hoursValue}
-          min={0}
-          step={1}
-          max={24}
-          onChange={handleChange}
-          valueLabelDisplay="on"
-          ValueLabelComponent={StyledValueLabel}
-          valueLabelFormat={valuetext}
-        />
+        </ButtonGroup>
+        <Divider />
         <Label component="h3">
           <LabelIcon>
             <EventIcon />

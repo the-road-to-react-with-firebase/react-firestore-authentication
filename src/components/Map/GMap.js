@@ -72,7 +72,7 @@ const DialogContainer = styled(Container)({
 });
 
 const Actions = styled(Button)({
-  margin: '8px 0',
+  margin: '6px 0',
 });
 
 Date.prototype.addDays = function(days) {
@@ -720,7 +720,6 @@ class GMap extends Component {
                 })
                 navigator.geolocation.getCurrentPosition(
                   (position) => {
-                    const newZoom = mapOptions.zoom + 2;
 
                     this.props.firebase.analytics.logEvent('location_found', { position: position});
                     this.setState({
@@ -730,7 +729,7 @@ class GMap extends Component {
                       lat: position.coords.latitude,
                       lng: position.coords.longitude,
                     });
-                    mapRef.setZoom(newZoom);
+                    mapRef.setZoom(15);
                   },
                   () => {
                     this.setState({
