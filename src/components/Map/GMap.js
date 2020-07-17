@@ -16,8 +16,11 @@ import { InfoWindow as InfoWindowVendor } from '../Map';
 
 import Typography from '@material-ui/core/Typography';
 
-import Modal from '@material-ui/core/Modal';
+import Dialog from '@material-ui/core/Dialog';
 import Container from '@material-ui/core/Container';
+import Toolbar from '@material-ui/core/Toolbar';
+import CloseIcon from '@material-ui/icons/Close';
+import Slide from '@material-ui/core/Slide';
 
 import Search from '../Search';
 
@@ -29,19 +32,11 @@ import { Spinner } from '../Loading';
 
 import { withFirebase } from '../Firebase';
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const headerHeight = 48+20;
-const FullModal = styled(Modal)({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100vw',
-  height: '100vh',
-});
-const FullModalContainer = styled(Container)({
-  height: '100vh',
-  padding: 30,
-  backgroundColor: '#ffffff',
-});
 const ButtonGrid = styled(Grid)({
   position: 'absolute',
   top: headerHeight+15,
@@ -615,8 +610,6 @@ class GMap extends Component {
                     ? <Spinner />
                     : <InfoWindowVendor
                         infoData={infoData}
-                        modal={FullModal}
-                        modalContainer={FullModalContainer}
                         onRender={(height) => {this.state.mapRef.panBy(0, (-height/2 - headerHeight))}} />
                   }
                 </div>
@@ -637,20 +630,29 @@ class GMap extends Component {
             <ButtonText selected={selectedVendor}>
             {selectedVendor ? selectedVendor.name : 'Search Vendors' }
             </ButtonText>
-            <FullModal
+            <Dialog
+              fullScreen
               open={modalOpen}
               onClose={this.onModalClose}
               aria-labelledby="modal-search-title"
               aria-describedby="modal-search-description"
+              TransitionComponent={Transition}
             >
-              <FullModalContainer>
-                <h2 id="modal-search-title">Search</h2>
+              <Container>
+                <Toolbar>
+                  <IconButton edge="start" color="inherit" onClick={this.onModalClose} aria-label="close">
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6" id="modal-search-title">
+                    Vendor Search
+                  </Typography>
+                </Toolbar>
                 {modalLoading
                   ? <Spinner />
                   : (
                     <div>
                       <p id="modal-search-description">
-                        Search for a vendor
+                        Search for a vendor by name
                       </p>
                       <Search
                         options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
@@ -663,8 +665,8 @@ class GMap extends Component {
                     </div>
                     )
                 }
-              </FullModalContainer>
-            </FullModal>
+              </Container>
+            </Dialog>
           </Grid>
           <Grid item xs={4}>
             <TopButton
@@ -678,17 +680,27 @@ class GMap extends Component {
             <ButtonText selected={filterSet}>
             {filterSet ? 'Filter Applied' : 'Search Vendors' }
             </ButtonText>
-            <FullModal
+            <Dialog
+              fullScreen
               open={filterModalOpen}
+              onClose={this.onFilterModalClose}
               aria-labelledby="modal-filter-title"
+              TransitionComponent={Transition}
             >
-              <FullModalContainer>
-                  <h2 id="modal-filter-title">Filter</h2>
-                  <div>
-                    <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
-                  </div>
-              </FullModalContainer>
-            </FullModal>
+              <Container>
+                <Toolbar>
+                  <IconButton edge="start" color="inherit" onClick={this.onFilterModalClose} aria-label="close">
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6" id="modal-filter-title">
+                    Filters
+                  </Typography>
+                </Toolbar>
+                <div>
+                  <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
+                </div>
+              </Container>
+            </Dialog>
           </Grid>
           <Grid item xs={4}>
             <TopButton
