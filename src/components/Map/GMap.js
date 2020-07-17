@@ -15,6 +15,8 @@ import MyLocationIcon from '@material-ui/icons/MyLocation';
 import SearchIcon from '@material-ui/icons/Search';
 import EventIcon from '@material-ui/icons/Event';
 
+import Typography from '@material-ui/core/Typography';
+
 import Modal from '@material-ui/core/Modal';
 import Container from '@material-ui/core/Container';
 
@@ -68,28 +70,34 @@ const ButtonGrid = styled(Grid)({
   position: 'absolute',
   top: headerHeight+15,
   textAlign: 'center',
-})
+});
 const RefreshPopover = styled(Popover)({
   margin: '0 auto',
+});
+const TopButton = styled(IconButton)({
+  margin: '0 auto',
+  display: 'block',
+  backgroundColor: (props) =>
+    props.selected
+      ? '#2699FB'
+      : '#ffffff',
+  border: (props) =>
+    props.selected
+      ? '2px solid white'
+      : '2px solid #2699FB',
+  color: (props) =>
+    props.selected
+      ? 'white'
+      : '#333333',
+});
+const ButtonText = styled(Typography)({
+  color: (props) =>
+    props.selected
+      ? '#2699FB'
+      : '#333333',
+  fontWeight: 500,
+  textShadow: '0 0 2px #ffffff, 0 0 5px #ffffff',
 })
-const ButtonLocate = styled(IconButton)({
-  margin: '0 auto',
-  display: 'block',
-  backgroundColor: '#ffffff',
-  border: '2px solid #2699FB',
-});
-const ButtonSearch = styled(IconButton)({
-  margin: '0 auto',
-  display: 'block',
-  backgroundColor: '#ffffff',
-  border: '2px solid #2699FB',
-});
-const ButtonFilter = styled(IconButton)({
-  margin: '0 auto',
-  display: 'block',
-  backgroundColor: '#ffffff',
-  border: '2px solid #2699FB',
-});
 
 Date.prototype.addDays = function(days) {
   var date = new Date(this.valueOf());
@@ -697,20 +705,18 @@ class GMap extends Component {
           </GoogleMap>
         </LoadScript>
         <ButtonGrid container spacing={3}>
-          <Grid item xs={4}>
-            <ButtonSearch
+          <Grid item xs={4} selected>
+            <TopButton
+              selected={selectedVendor}
               type="button"
               onClick={this.onModalOpen}
               aria-label="Search"
             >
               <SearchIcon />
-            </ButtonSearch>
-            {selectedVendor
-              ?
-                <span>{selectedVendor.name}</span>
-              :
-                <span>Search Vendors</span>
-            }
+            </TopButton>
+            <ButtonText selected={selectedVendor}>
+            {selectedVendor ? selectedVendor.name : 'Search Vendors' }
+            </ButtonText>
             <SearchModal
               open={modalOpen}
               onClose={this.onModalClose}
@@ -741,20 +747,17 @@ class GMap extends Component {
             </SearchModal>
           </Grid>
           <Grid item xs={4}>
-            <ButtonFilter
+            <TopButton
+              selected={filterSet}
               type="button"
               onClick={this.onFilterModalOpen}
               aria-label="Search"
             >
               <EventIcon />
-            </ButtonFilter>
-
-            {filterSet
-              ?
-                <span>Filter applied</span>
-              :
-                <span>Filter by Date or Time</span>
-            }
+            </TopButton>
+            <ButtonText selected={filterSet}>
+            {filterSet ? 'Filter Applied' : 'Search Vendors' }
+            </ButtonText>
             <FilterModal
               open={filterModalOpen}
               aria-labelledby="modal-filter-title"
@@ -768,7 +771,8 @@ class GMap extends Component {
             </FilterModal>
           </Grid>
           <Grid item xs={4}>
-            <ButtonLocate
+            <TopButton
+              selected={locationLoading}
               onClick={() => {
                 this.props.firebase.analytics.logEvent('location_detect');
                 this.setState({
@@ -799,13 +803,15 @@ class GMap extends Component {
               aria-label="Find my location"
             >
               {locationLoading  ? (
-                <Spinner />
+                <Spinner color='#ffffff' />
                 ) : (
                 <MyLocationIcon />
                 )
               }
-            </ButtonLocate>
-            Find My Location
+            </TopButton>
+            <ButtonText selected={locationLoading}>
+            {locationLoading ? 'Finding Location...' : 'Find My Location' }
+            </ButtonText>
           </Grid>
           {refresh &&
             <Grid item xs={12}>
