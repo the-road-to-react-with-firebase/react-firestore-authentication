@@ -1,6 +1,10 @@
 /* eslint-disable no-use-before-define */
 import React from 'react';
 
+import PropTypes from 'prop-types';
+
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+
 // @material-ui/pickers
 import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
 import TextField from "@material-ui/core/TextField";
@@ -8,11 +12,79 @@ import { LocalizationProvider, StaticDateRangePicker, DateRangeDelimiter } from 
 
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ScheduleIcon from '@material-ui/icons/Schedule';
+import EventIcon from '@material-ui/icons/Event';
+
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Slider from '@material-ui/core/Slider';
+import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
 import Button from '@material-ui/core/Button';
+
+const Label = withStyles({
+  root: {
+    paddingLeft: 0,
+    marginBottom: 5,
+    marginTop: 0,
+  },
+})(ListItem);
+const LabelIcon = withStyles({
+  root: {
+    minWidth: 30,  
+  },
+})(ListItemIcon);
+
+const StyledValueLabel = withStyles({
+  circle: {
+    width: 40,
+    height: 40,
+  },
+  label: {
+    color: '#ffffff',
+  }
+})(ValueLabel);
+
+const HoursSlider = withStyles({
+  root: {
+    height: 6,
+    margin: '50px 20px',
+  },
+  thumb: {
+    height: 24,
+    width: 24,
+    backgroundColor: '#fff',
+    border: '2px solid currentColor',
+    marginTop: -8,
+    marginLeft: -12,
+    '&:focus, &:hover, &$active': {
+      boxShadow: 'inherit',
+    },
+  },
+  active: {},
+  valueLabel: {
+    left: -10,
+    top: -40,
+  },
+  track: {
+    height: 8,
+    borderRadius: 4,
+  },
+  rail: {
+    height: 8,
+    borderRadius: 4,
+  },
+})(Slider);
+
+const Actions = withStyles({
+  root: {
+    margin: '8px 0',
+  },
+})(Button);
 
 function valuetext(value) {
   let postText = 'AM';
@@ -64,7 +136,12 @@ export default function CalendarFilter(props) {
   return (
     <div>
       <FormControl>
-        <FormLabel id="hours" component="legend">Hours</FormLabel>
+        <Label component="h3">
+          <LabelIcon>
+            <ScheduleIcon />
+          </LabelIcon>
+          <ListItemText primary="Hours" />
+        </Label>
         <ToggleButtonGroup
           value={time}
           exclusive
@@ -84,20 +161,22 @@ export default function CalendarFilter(props) {
             Dinner
           </ToggleButton>
         </ToggleButtonGroup>
-        <Slider
+        <HoursSlider
           value={hoursValue}
           min={0}
           step={1}
           max={24}
           onChange={handleChange}
           valueLabelDisplay="on"
-          aria-labelledby="legend"
+          ValueLabelComponent={StyledValueLabel}
           valueLabelFormat={valuetext}
         />
-      </FormControl>
-      <hr />
-      <FormControl>
-        <FormLabel id="dates" component="legend">Days</FormLabel>
+        <Label component="h3">
+          <LabelIcon>
+            <EventIcon />
+          </LabelIcon>
+          <ListItemText primary="Days" />
+        </Label>
         <LocalizationProvider dateAdapter={DateFnsUtils}>
           <StaticDateRangePicker
             disablePast
@@ -115,12 +194,12 @@ export default function CalendarFilter(props) {
           />
         </LocalizationProvider>
       </FormControl>
-      <Button onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
+      <Actions onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
         Apply Filters
-      </Button>
-      <Button onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth>
+      </Actions>
+      <Actions onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth>
         Clear Filters
-      </Button>
+      </Actions>
     </div>
   );
 }

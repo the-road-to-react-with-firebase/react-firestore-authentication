@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { format, formatRelative } from 'date-fns';
 
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-
 import { CalendarList } from '../Calendar';
 
 import Typography from '@material-ui/core/Typography';
@@ -27,18 +25,11 @@ import Toolbar from '@material-ui/core/Toolbar';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-  },
-}));
-
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 export default function InfoWindow(props) {
-  const classes = useStyles();
-  const theme = useTheme();
   const observed = useRef(null);
   const [infoData, setInfoData] = useState(props.infoData);
   const [modalOpen, setModalOpen] = useState(false);

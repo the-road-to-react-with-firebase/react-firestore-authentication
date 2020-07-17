@@ -65,7 +65,15 @@ const ButtonText = styled(Typography)({
       : '#333333',
   fontWeight: 500,
   textShadow: '0 0 2px #ffffff, 0 0 5px #ffffff',
-})
+});
+
+const DialogContainer = styled(Container)({
+  padding: '0 20px',
+});
+
+const Actions = styled(Button)({
+  margin: '8px 0',
+});
 
 Date.prototype.addDays = function(days) {
   var date = new Date(this.valueOf());
@@ -650,19 +658,19 @@ class GMap extends Component {
                 {modalLoading
                   ? <Spinner />
                   : (
-                    <div>
+                    <DialogContainer>
                       <p id="modal-search-description">
                         Search for a vendor by name
                       </p>
                       <Search
                         options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
-                      <Button onClick={this.onModalClose} fullWidth variant="contained" color="primary">
+                      <Actions onClick={this.onModalClose} fullWidth variant="contained" color="primary">
                         Find Vendor
-                      </Button>
-                      <Button onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
+                      </Actions>
+                      <Actions onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
                         Clear Search
-                      </Button>
-                    </div>
+                      </Actions>
+                    </DialogContainer>
                     )
                 }
               </Container>
@@ -673,12 +681,12 @@ class GMap extends Component {
               selected={filterSet}
               type="button"
               onClick={this.onFilterModalOpen}
-              aria-label="Search"
+              aria-label="Filter by date or time"
             >
               <EventIcon />
             </TopButton>
             <ButtonText selected={filterSet}>
-            {filterSet ? 'Filter Applied' : 'Search Vendors' }
+            {filterSet ? 'Filter Applied' : 'Filter by Hours or Days' }
             </ButtonText>
             <Dialog
               fullScreen
@@ -696,9 +704,9 @@ class GMap extends Component {
                     Filters
                   </Typography>
                 </Toolbar>
-                <div>
+                <DialogContainer> 
                   <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
-                </div>
+                </DialogContainer>
               </Container>
             </Dialog>
           </Grid>
