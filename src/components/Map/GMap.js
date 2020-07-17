@@ -95,7 +95,9 @@ const ButtonFilter = styled(IconButton)({
 
 Date.prototype.addDays = function(days) {
   var date = new Date(this.valueOf());
+
   date.setDate(date.getDate() + days);
+
   return date;
 }
 function getDaysInRange(startDate, endDate) {
@@ -237,8 +239,7 @@ class GMap extends Component {
       selected: null,
       selectedVendor: null,
     });
-    this.state.mapRef.panTo(mapOptions.center)
-    this.state.mapRef.setZoom(mapOptions.zoom);
+    this.setNewBounds(this.state.fullCalendar);
   }
 
   filterCalendarByVendor = (vendorId) => {
@@ -300,6 +301,7 @@ class GMap extends Component {
       const startDateFilter = new Date(dates[0].getTime());
       const endDateFilter = (!dates[1]) ? startDateFilter : new Date(dates[1].getTime());
       const filterDays = getDaysInRange(startDateFilter, endDateFilter);
+
       for (i = currentCalendar.length - 1; i >= 0; i--) {
         if(currentCalendar[i].recurring) {
           // Check if some of event days are within filter range
@@ -368,7 +370,12 @@ class GMap extends Component {
 
   isOpen = (event) => {
     let now = new Date();
-    return (now < event.end_time.toDate() && now > event.start_time.toDate());
+
+    if(event.recurring) {
+      return event.days.includes(now.getDay());
+    } else {
+      return (now < event.end_time.toDate() && now > event.start_time.toDate());
+    }
   }
 
   setNewBounds = (markers) => {
@@ -400,6 +407,48 @@ class GMap extends Component {
           let firstDay = true;
 
           if(vendorEvents[0].recurring) {
+            const today = new Date();
+            const todayDay = today.getDay();
+            const startDate = vendorEvents[0].start_time.toDate();
+            const startHour = startDate.getHours();
+            const startMinutes = startDate.getMinutes();
+            const endDate = vendorEvents[0].end_time.toDate();
+            const endHour = endDate.getHours();
+            const endMinutes = endDate.getMinutes();
+            let newStart = new Date();
+            let newEnd = new Date();
+            let checkDay = todayDay;
+            let dateSet = false;
+
+            // Set start_time and end_time of next recurring event (closest to today)
+            // Go through event days array starting at index of todayDay
+            do {
+              let eventDay = (vendorEvents[0].days.indexOf(checkDay) != -1) ? vendorEvents[0].days[vendorEvents[0].days.indexOf(checkDay)] : null;
+
+              if((eventDay === todayDay) && ((today.getHours() + today.getMinutes()*.01) < (endHour + endMinutes*.01))) {
+                // Happening today and hasn't ended yet - keep newStart and newEnd value of today
+                dateSet = true;
+              } else if(todayDay < eventDay) {
+                // If recurring day is greater than today, add days for new event dates
+                newStart = newStart.addDays(eventDay - todayDay)
+                newEnd = newEnd.addDays(eventDay - todayDay);
+                dateSet = true;
+              }
+              checkDay++;
+            } while(checkDay < 7 && !dateSet);
+            if(!dateSet) {
+              // If recurring day is less than today, add 7 - today day value + recurring day value for next event day
+              newStart = newStart.addDays(7 - todayDay + vendorEvents[0].days[0]); // First recurring day in array is next event day
+              newEnd = newEnd.addDays(7 - todayDay + vendorEvents[0].days[0]);
+            }
+
+            newStart.setHours(startHour);
+            newStart.setMinutes(startMinutes);
+            vendorEvents[0].start_time = new this.props.firebase.firestore.Timestamp.fromDate(newStart);
+            newEnd.setHours(endHour);
+            newEnd.setMinutes(endMinutes);
+            vendorEvents[0].end_time = new this.props.firebase.firestore.Timestamp.fromDate(newEnd);
+            // Create plain text recurring days string
             vendorEvents[0].days.map(day => {
               if(firstDay) {
                 nextEventDays += getDayString(day) + 's';
@@ -636,7 +685,7 @@ class GMap extends Component {
                             <ListItemIcon>
                             </ListItemIcon>
                             <ListItemText
-                              primary={infoData.events.length + ' events at this location'}
+                              primary={(infoData.events.length-1) + ' other event' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
                               secondary='View all dates and times'
                             />
                           </ListItem>
