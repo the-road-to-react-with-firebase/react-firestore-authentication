@@ -20,6 +20,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Container from '@material-ui/core/Container';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseIcon from '@material-ui/icons/Close';
+import DoneIcon from '@material-ui/icons/Done';
 import Slide from '@material-ui/core/Slide';
 
 import Search from '../Search';
@@ -68,7 +69,11 @@ const ButtonText = styled(Typography)({
 });
 
 const DialogContainer = styled(Container)({
-  padding: '0 20px',
+  padding: '0 30px',
+});
+const DialogToolbar = styled(Toolbar)({
+  display: 'flex',
+  justifyContent: 'space-between',
 });
 
 const Actions = styled(Button)({
@@ -646,34 +651,35 @@ class GMap extends Component {
               aria-describedby="modal-search-description"
               TransitionComponent={Transition}
             >
-              <Container>
-                <Toolbar>
-                  <IconButton edge="start" color="inherit" onClick={this.onModalClose} aria-label="close">
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography variant="h6" id="modal-search-title">
-                    Vendor Search
-                  </Typography>
-                </Toolbar>
-                {modalLoading
-                  ? <Spinner />
-                  : (
-                    <DialogContainer>
-                      <p id="modal-search-description">
-                        Search for a vendor by name
-                      </p>
-                      <Search
-                        options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
-                      <Actions onClick={this.onModalClose} fullWidth variant="contained" color="primary">
-                        Find Vendor
-                      </Actions>
-                      <Actions onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
-                        Clear Search
-                      </Actions>
-                    </DialogContainer>
-                    )
-                }
-              </Container>
+              <DialogToolbar>
+                <IconButton edge="start" color="inherit" onClick={this.onModalClose} aria-label="close">
+                  <CloseIcon />
+                </IconButton>
+                <Typography variant="h6" id="modal-search-title">
+                  Vendor Search
+                </Typography>
+                <IconButton edge="end" color="inherit" onClick={this.onModalClose} aria-label="close">
+                  <DoneIcon />
+                </IconButton>
+              </DialogToolbar>
+              {modalLoading
+                ? <Spinner />
+                : (
+                  <DialogContainer>
+                    <p id="modal-search-description">
+                      Search for a vendor by name
+                    </p>
+                    <Search
+                      options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
+                    <Actions onClick={this.onModalClose} fullWidth variant="contained" color="primary">
+                      Find Vendor
+                    </Actions>
+                    <Actions onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
+                      Clear Search
+                    </Actions>
+                  </DialogContainer>
+                  )
+              }
             </Dialog>
           </Grid>
           <Grid item xs={4}>
@@ -695,19 +701,7 @@ class GMap extends Component {
               aria-labelledby="modal-filter-title"
               TransitionComponent={Transition}
             >
-              <Container>
-                <Toolbar>
-                  <IconButton edge="start" color="inherit" onClick={this.onFilterModalClose} aria-label="close">
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography variant="h6" id="modal-filter-title">
-                    Filters
-                  </Typography>
-                </Toolbar>
-                <DialogContainer> 
-                  <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
-                </DialogContainer>
-              </Container>
+              <Filter values={{filteredHours,filteredHoursToggle,filteredDates}} onChange={(hours, toggle, dates) => {this.setFilters(hours, toggle, dates)}}  />
             </Dialog>
           </Grid>
           <Grid item xs={4}>

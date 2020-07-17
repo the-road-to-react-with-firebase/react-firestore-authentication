@@ -10,6 +10,12 @@ import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
 import TextField from "@material-ui/core/TextField";
 import { LocalizationProvider, StaticDateRangePicker, DateRangeDelimiter } from "@material-ui/pickers";
 
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import DoneIcon from '@material-ui/icons/Done';
+import Typography from '@material-ui/core/Typography';
+
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 
@@ -29,6 +35,22 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 
 import Container from '@material-ui/core/Container';
+
+
+const DialogContainer =  withStyles({
+  root: {
+    padding: '0 30px',
+    maxWidth: 420,
+    margin: '0 auto',
+  }
+})(Container);
+
+const DialogToolbar =  withStyles({
+  root: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+})(Toolbar);
 
 const Label = withStyles({
   root: {
@@ -158,74 +180,87 @@ export default function CalendarFilter(props) {
 
   return (
     <div>
-      <FormControl fullWidth>
-        <Label component="h3">
-          <LabelIcon>
-            <ScheduleIcon />
-          </LabelIcon>
-          <ListItemText primary="Hours" />
-        </Label>
-        <SliderContainer>
-          <HoursSlider
-            value={hoursValue}
-            min={0}
-            step={1}
-            max={24}
-            onChange={handleChange}
-            valueLabelDisplay="on"
-            ValueLabelComponent={StyledValueLabel}
-            valueLabelFormat={valuetext}
-          />
-        </SliderContainer>
-        <ButtonGroup
-          value={time}
-          exclusive
-          onChange={handleToggle}
-          aria-label="select time"
-        >
-          <ToggleButton value='any' aria-label="left aligned">
-            Anytime
-          </ToggleButton>
-          <ToggleButton value='breakfast' aria-label="centered">
-            Breakfast
-          </ToggleButton>
-          <ToggleButton value='lunch' aria-label="right aligned">
-            Lunch
-          </ToggleButton>
-          <ToggleButton value='dinner' aria-label="justified">
-            Dinner
-          </ToggleButton>
-        </ButtonGroup>
-        <Divider />
-        <Label component="h3">
-          <LabelIcon>
-            <EventIcon />
-          </LabelIcon>
-          <ListItemText primary="Days" />
-        </Label>
-        <LocalizationProvider dateAdapter={DateFnsUtils}>
-          <StaticDateRangePicker
-            disablePast
-            showToolbar={false}
-            displayStaticWrapperAs="mobile"
-            value={selectedDate}
-            onChange={date => handleDateChange(date)}
-            renderInput={(startProps, endProps) => (
-              <React.Fragment>
-                <TextField {...startProps} />
-                <DateRangeDelimiter> to </DateRangeDelimiter>
-                <TextField {...endProps} />
-              </React.Fragment>
-            )}
-          />
-        </LocalizationProvider>
-      </FormControl>
-      <Actions onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
-        Apply Filters
-      </Actions>
-      <Actions onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth>
-        Clear Filters
-      </Actions>
+      <DialogToolbar>
+        <IconButton edge="start" color="inherit" onClick={() => { returnFilters(hoursValue, time, selectedDate) }} aria-label="close">
+          <CloseIcon />
+        </IconButton>
+        <Typography variant="h6" id="modal-filter-title">
+          Filters
+        </Typography>
+        <IconButton edge="end" color="inherit" onClick={() => { returnFilters(hoursValue, time, selectedDate) }} aria-label="close">
+          <DoneIcon />
+        </IconButton>
+      </DialogToolbar>
+      <DialogContainer>
+        <FormControl fullWidth>
+          <Label component="h3">
+            <LabelIcon>
+              <ScheduleIcon />
+            </LabelIcon>
+            <ListItemText primary="Hours" />
+          </Label>
+          <SliderContainer>
+            <HoursSlider
+              value={hoursValue}
+              min={0}
+              step={1}
+              max={24}
+              onChange={handleChange}
+              valueLabelDisplay="on"
+              ValueLabelComponent={StyledValueLabel}
+              valueLabelFormat={valuetext}
+            />
+          </SliderContainer>
+          <ButtonGroup
+            value={time}
+            exclusive
+            onChange={handleToggle}
+            aria-label="select time"
+          >
+            <ToggleButton value='any' aria-label="left aligned">
+              Anytime
+            </ToggleButton>
+            <ToggleButton value='breakfast' aria-label="centered">
+              Breakfast
+            </ToggleButton>
+            <ToggleButton value='lunch' aria-label="right aligned">
+              Lunch
+            </ToggleButton>
+            <ToggleButton value='dinner' aria-label="justified">
+              Dinner
+            </ToggleButton>
+          </ButtonGroup>
+          <Divider />
+          <Label component="h3">
+            <LabelIcon>
+              <EventIcon />
+            </LabelIcon>
+            <ListItemText primary="Days" />
+          </Label>
+          <LocalizationProvider dateAdapter={DateFnsUtils}>
+            <StaticDateRangePicker
+              disablePast
+              showToolbar={false}
+              displayStaticWrapperAs="mobile"
+              value={selectedDate}
+              onChange={date => handleDateChange(date)}
+              renderInput={(startProps, endProps) => (
+                <React.Fragment>
+                  <TextField {...startProps} />
+                  <DateRangeDelimiter> to </DateRangeDelimiter>
+                  <TextField {...endProps} />
+                </React.Fragment>
+              )}
+            />
+          </LocalizationProvider>
+        </FormControl>
+        <Actions onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
+          Apply Filters
+        </Actions>
+        <Actions onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth>
+          Clear Filters
+        </Actions>
+      </DialogContainer>
     </div>
   );
 }
