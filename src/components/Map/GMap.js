@@ -24,6 +24,8 @@ import DoneIcon from '@material-ui/icons/Done';
 import Slide from '@material-ui/core/Slide';
 
 import Search from '../Search';
+import FormControl from '@material-ui/core/FormControl';
+import AppBar from '@material-ui/core/AppBar';
 
 import Filter from '../Filter';
 
@@ -76,6 +78,12 @@ const DialogToolbar = styled(Toolbar)({
   justifyContent: 'space-between',
 });
 
+const ActionsBar = styled(AppBar)({
+  top: 'auto',
+  bottom: 0,
+  padding: '10px 30px',
+  backgroundColor: '#ffffff',
+});
 const Actions = styled(Button)({
   margin: '6px 0',
 });
@@ -666,17 +674,21 @@ class GMap extends Component {
                 ? <Spinner />
                 : (
                   <DialogContainer>
-                    <p id="modal-search-description">
-                      Search for a vendor by name
-                    </p>
-                    <Search
-                      options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
-                    <Actions onClick={this.onModalClose} fullWidth variant="contained" color="primary">
-                      Find Vendor
-                    </Actions>
-                    <Actions onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
-                      Clear Search
-                    </Actions>
+                    <FormControl fullWidth>
+                      <p id="modal-search-description">
+                        Search for a vendor by name
+                      </p>
+                      <Search
+                        options={vendors} currentValue={selectedVendor} onChange={(value) => {this.setSelectedVendor(value)}} />
+                    </FormControl>
+                    <ActionsBar position="fixed" color="primary">
+                      <Actions onClick={this.onModalClose} fullWidth variant="contained" color="primary">
+                        Find Vendor
+                      </Actions>
+                      <Actions onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
+                        Clear Search
+                      </Actions>
+                    </ActionsBar>
                   </DialogContainer>
                   )
               }

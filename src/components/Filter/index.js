@@ -10,6 +10,8 @@ import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
 import TextField from "@material-ui/core/TextField";
 import { LocalizationProvider, StaticDateRangePicker, DateRangeDelimiter } from "@material-ui/pickers";
 
+import AppBar from '@material-ui/core/AppBar';
+
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
@@ -51,6 +53,15 @@ const DialogToolbar =  withStyles({
     justifyContent: 'space-between',
   },
 })(Toolbar);
+
+const ActionsBar =  withStyles({
+  root: {
+    top: 'auto',
+    bottom: 0,
+    padding: '10px 30px',
+    backgroundColor: '#ffffff',
+  }
+})(AppBar);
 
 const Label = withStyles({
   root: {
@@ -181,7 +192,7 @@ export default function CalendarFilter(props) {
   return (
     <div>
       <DialogToolbar>
-        <IconButton edge="start" color="inherit" onClick={() => { returnFilters(hoursValue, time, selectedDate) }} aria-label="close">
+        <IconButton edge="start" color="inherit" onClick={() => { returnFilters([0,24], 'any', [null,null]) }} aria-label="close">
           <CloseIcon />
         </IconButton>
         <Typography variant="h6" id="modal-filter-title">
@@ -254,12 +265,14 @@ export default function CalendarFilter(props) {
             />
           </LocalizationProvider>
         </FormControl>
-        <Actions onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
-          Apply Filters
-        </Actions>
-        <Actions onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth>
-          Clear Filters
-        </Actions>
+        <ActionsBar position="fixed" color="primary">
+          <Actions onClick={() => { returnFilters(hoursValue, time, selectedDate) }} fullWidth variant="contained" color="primary">
+            Apply Filters
+          </Actions>
+          <Actions onClick={() => { returnFilters([0,24], 'any', [null,null]) }} fullWidth>
+            Clear Filters
+          </Actions>
+        </ActionsBar>
       </DialogContainer>
     </div>
   );
