@@ -481,6 +481,9 @@ class GMap extends Component {
               isOpen: this.isOpen(nextEvent),
               nextEvent: nextEvent,
               events: vendorEvents,
+              photo: vendor.data().photo,
+              facebook: vendor.data().facebook,
+              instagram: vendor.data().instagram,
             }
           });
         }, err => {

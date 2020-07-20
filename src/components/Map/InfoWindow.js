@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { format, formatRelative } from 'date-fns';
 
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+
 import { CalendarList } from '../Calendar';
 
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
@@ -25,6 +28,37 @@ import Toolbar from '@material-ui/core/Toolbar';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 
+import FacebookIcon from '@material-ui/icons/Facebook';
+import InstagramIcon from '@material-ui/icons/Instagram';
+
+const Title = withStyles({
+  root: {
+    textTransform: 'uppercase',
+    fontFamily: 'Arial Rounded MT Bold,Helvetica Rounded,Arial,sans-serif',
+    fontSize: '1.3rem',
+    color: '#2699FB',
+  },
+})(Typography);
+
+const CompactListItem = withStyles({
+  root: {
+    padding: '2px 4px',
+  },
+})(ListItem);
+
+const CompactListItemIcon = withStyles({
+  root: {
+    minWidth: 32,
+    marginTop: 5,
+  },
+})(ListItemIcon);
+
+const ListItemTextCenter = withStyles({
+  root: {
+    textAlign: 'center',
+  },
+})(ListItemText);
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -44,90 +78,114 @@ export default function InfoWindow(props) {
   }
 
   return (
-    <div ref={observed}>
-      <Typography variant="h5" component="h2">
+    <Container disableGutters ref={observed}>
+      <Title variant="h5" component="h2">
         {infoData.title}
-      </Typography>
-      <List>
-        <ListItem key="address" button onClick={() => openDirections(infoData.events[0].location)}>
-          <ListItemIcon>
-            <DirectionsIcon />
-          </ListItemIcon>
-          <ListItemText primary={infoData.address} />
-        </ListItem>
-        {infoData.phone &&
-          <ListItem key="phone" button onClick={() => window.open('tel:' + infoData.phone)}>
-            <ListItemIcon>
-              <PhoneIcon />
-            </ListItemIcon>
-            <ListItemText primary={infoData.phone} />
-          </ListItem>
-        }
-        <ListItem key="open">
-          <ListItemIcon>
-            <ScheduleIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={infoData.isOpen ? 'Open now' : 'Closed'}
-            secondary={(infoData.isOpen ? (format(infoData.nextEvent.start_time.toDate(), 'p') + format(infoData.nextEvent.end_time.toDate(), ' - p')) : ('Opens ' + formatRelative(infoData.nextEvent.start_time.toDate(), new Date()))) }
-            className={infoData.isOpen ? 'text-open' : 'text-closed'}
-          />
-        </ListItem>
-        <ListItem key="hours">
-          <ListItemIcon>
-            <EventIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={infoData.nextEvent.recurring ? infoData.nextEvent.daysString : format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do')}
-            secondaryTypographyProps={{component:'div'}}
-            secondary={
-              <React.Fragment>
-                <div>{ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }</div>
-                {infoData.nextEvent.additionalHours && (infoData.nextEvent.additionalHours.map((hour, index) => (
-                  <div key={index}>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
-                )))}
-              </React.Fragment>
+      </Title>
+      <Grid container spacing={1}>
+        <Grid item xs={8}>
+          <List>
+            <CompactListItem alignItems={'flex-start'} key="address" button onClick={() => openDirections(infoData.events[0].location)}>
+              <CompactListItemIcon>
+                <DirectionsIcon />
+              </CompactListItemIcon>
+              <ListItemText primary={infoData.address} />
+            </CompactListItem>
+            {infoData.phone &&
+              <CompactListItem alignItems={'flex-start'} key="phone" button onClick={() => window.open('tel:' + infoData.phone)}>
+                <CompactListItemIcon>
+                  <PhoneIcon />
+                </CompactListItemIcon>
+                <ListItemText primary={infoData.phone} />
+              </CompactListItem>
             }
-          />
-        </ListItem>
-        {infoData.events.length > 1 &&
-          <div>
-            <ListItem
-              key="calendar"
-              button
-              onClick={() => setModalOpen(true)}>
-                <ListItemText
-                  inset
-                  primary={(infoData.events.length-1) + ' other event' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
-                  secondary='View all dates and times'
-                />
-              </ListItem>
-              <Dialog
-                fullScreen
-                open={modalOpen}
-                TransitionComponent={Transition}
-                aria-labelledby="modal-calendar-title"
-              >
-                <Container>
-                  <Toolbar>
-                    <IconButton edge="start" color="inherit" onClick={() => setModalOpen(false)} aria-label="close">
-                      <CloseIcon />
-                    </IconButton>
-                    <Typography variant="h6" id="modal-calendar-title">
-                      All events at this location
-                    </Typography>
-                  </Toolbar>
-                  <CalendarList calendar={infoData.events} />
-                  <Button
-                    onClick={() => setModalOpen(false)}
-                    fullWidth>
-                    Back to Map
-                  </Button>
-                </Container>
-              </Dialog>
-          </div>
-        }
-      </List>
-    </div>
+            <CompactListItem alignItems={'flex-start'} key="open">
+              <CompactListItemIcon>
+                <ScheduleIcon />
+              </CompactListItemIcon>
+              <ListItemText
+                primary={infoData.isOpen ? 'Open now' : 'Closed'}
+                secondary={(infoData.isOpen ? (format(infoData.nextEvent.start_time.toDate(), 'p') + format(infoData.nextEvent.end_time.toDate(), ' - p')) : ('Opens ' + formatRelative(infoData.nextEvent.start_time.toDate(), new Date()))) }
+                className={infoData.isOpen ? 'text-open' : 'text-closed'}
+              />
+            </CompactListItem>
+            <CompactListItem alignItems={'flex-start'} key="hours">
+              <CompactListItemIcon>
+                <EventIcon />
+              </CompactListItemIcon>
+              <ListItemText
+                primary={infoData.nextEvent.recurring ? infoData.nextEvent.daysString : format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do')}
+                secondaryTypographyProps={{component:'div'}}
+                secondary={
+                  <React.Fragment>
+                    <div>{ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }</div>
+                    {infoData.nextEvent.additionalHours && (infoData.nextEvent.additionalHours.map((hour, index) => (
+                      <div key={index}>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
+                    )))}
+                  </React.Fragment>
+                }
+              />
+            </CompactListItem>
+          </List>
+        </Grid>
+        <Grid item xs={4} style={{marginTop: 8, textAlign: 'center'}}>
+          {infoData.photo &&
+            <img src={infoData.photo} style={{width:'100%'}} />
+          }
+          <Grid container justify="space-evenly" spacing={1}>
+            {infoData.instagram &&
+              <Grid item xs>
+                <IconButton size="small" onClick={() => window.open('https://www.instagram.com/'+infoData.instagram)} aria-label="Instagram">
+                  <InstagramIcon />
+                </IconButton>
+              </Grid>
+            }
+            {infoData.facebook &&
+              <Grid item xs>
+                <IconButton size="small" onClick={() => window.open('https://www.facebook.com/'+infoData.facebook)} aria-label="Facebook">
+                  <FacebookIcon />
+                </IconButton>
+              </Grid>
+            }
+          </Grid>
+        </Grid>
+      </Grid>
+      {infoData.events.length > 1 &&
+        <List>
+          <CompactListItem
+            key="calendar"
+            button
+            onClick={() => setModalOpen(true)}>
+              <ListItemTextCenter
+                primary={(infoData.events.length-1) + ' other event' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
+                secondary='View all dates and times'
+              />
+            </CompactListItem>
+            <Dialog
+              fullScreen
+              open={modalOpen}
+              TransitionComponent={Transition}
+              aria-labelledby="modal-calendar-title"
+            >
+              <Container>
+                <Toolbar>
+                  <IconButton edge="start" color="inherit" onClick={() => setModalOpen(false)} aria-label="close">
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6" id="modal-calendar-title">
+                    All events at this location
+                  </Typography>
+                </Toolbar>
+                <CalendarList calendar={infoData.events} />
+                <Button
+                  onClick={() => setModalOpen(false)}
+                  fullWidth>
+                  Back to Map
+                </Button>
+              </Container>
+            </Dialog>
+        </List>
+      }
+    </Container>
   );
 }
