@@ -262,7 +262,7 @@ class GMap extends Component {
         snapshot.forEach(event =>{
           const eventData = event.data();
 
-          if(eventData.recurring) {
+          if(eventData.recurring_start) {
             if(eventData.recurring_end.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
           } else if(eventData.end_time.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
         });
@@ -370,7 +370,7 @@ class GMap extends Component {
       const filterDays = getDaysInRange(startDateFilter, endDateFilter);
 
       for (i; i < currentCalendar.length; i++) {
-        if(currentCalendar[i].recurring) {
+        if(currentCalendar[i].recurring_start) {
           // Check if some of event days are within filter range
           if(
             ((currentCalendar[i].recurring_start.toDate() >= startDateFilter) && (currentCalendar[i].recurring_start.toDate() <= endDateFilter)) ||
@@ -447,7 +447,7 @@ class GMap extends Component {
   isOpen = (event) => {
     let now = new Date();
 
-    if(event.recurring) {
+    if(event.recurring_start) {
       return event.days.includes(now.getDay());
     } else {
       return (now < event.end_time.toDate() && now > event.start_time.toDate());
@@ -479,10 +479,10 @@ class GMap extends Component {
         .onSnapshot(vendor => {
           let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
 
-          if(vendorEvents[0].recurring) {
+          if(vendorEvents[0].recurring_start) {
             // If next event is recurring then we need to calculate updated start_time for all recurring events to display correct order by date
             for (var i = vendorEvents.length - 1; i >= 0; i--) {
-              if(vendorEvents[i].recurring) vendorEvents[i] = getNextDate(vendorEvents[i], this.props);
+              if(vendorEvents[i].recurring_start) vendorEvents[i] = getNextDate(vendorEvents[i], this.props);
             }
             vendorEvents.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
           }

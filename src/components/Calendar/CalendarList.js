@@ -52,7 +52,7 @@ export default function CalendarList(props) {
           <EventIcon color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={event.recurring ? event.daysString : format(event.start_time.toDate(), 'EEEE, MMMM do')}
+          primary={event.recurring_start ? event.daysString : format(event.start_time.toDate(), 'EEEE, MMMM do')}
           secondaryTypographyProps={{component:'div'}}
           secondary={
             <React.Fragment>

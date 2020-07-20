@@ -121,7 +121,7 @@ export default function InfoWindow(props) {
                 <EventIcon />
               </CompactListItemIcon>
               <ListItemText
-                primary={infoData.nextEvent.recurring ? infoData.nextEvent.daysString : format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do')}
+                primary={infoData.nextEvent.recurring_start ? infoData.nextEvent.daysString : format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do')}
                 secondaryTypographyProps={{component:'div'}}
                 secondary={
                   <React.Fragment>
