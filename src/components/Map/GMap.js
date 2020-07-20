@@ -126,6 +126,67 @@ function getDayString(dayValue) {
 
   return weekday[dayValue];
 }
+function getNextDate(recurringEvent, props) {
+  // Determines the next date of a recurring event after the current date and time
+  // Adds plain text days string (daysString) to returned object
+  let recurringEventDays = '';
+  let firstDay = true;
+
+  const today = new Date();
+  const todayDay = today.getDay();
+  const startDate = recurringEvent.start_time.toDate();
+  const startHour = startDate.getHours();
+  const startMinutes = startDate.getMinutes();
+  const endDate = recurringEvent.end_time.toDate();
+  const endHour = endDate.getHours();
+  const endMinutes = endDate.getMinutes();
+  let newStart = new Date();
+  let newEnd = new Date();
+  let checkDay = todayDay;
+  let dateSet = false;
+
+  // Set start_time and end_time of next recurring event (closest to today)
+  // Go through event days array starting at index of todayDay
+  do {
+    let eventDay = (recurringEvent.days.indexOf(checkDay) != -1) ? recurringEvent.days[recurringEvent.days.indexOf(checkDay)] : null;
+
+    if((eventDay === todayDay) && ((today.getHours() + today.getMinutes()*.01) < (endHour + endMinutes*.01))) {
+      // Happening today and hasn't ended yet - keep newStart and newEnd value of today
+      dateSet = true;
+    } else if(todayDay < eventDay) {
+      // If recurring day is greater than today, add days for new event dates
+      newStart = newStart.addDays(eventDay - todayDay)
+      newEnd = newEnd.addDays(eventDay - todayDay);
+      dateSet = true;
+    }
+    checkDay++;
+  } while(checkDay < 7 && !dateSet);
+  if(!dateSet) {
+    // If recurring day is less than today, add 7 - today day value + recurring day value for next event day
+    newStart = newStart.addDays(7 - todayDay + recurringEvent.days[0]); // First recurring day in array is next event day
+    newEnd = newEnd.addDays(7 - todayDay + recurringEvent.days[0]);
+  }
+
+  newStart.setHours(startHour);
+  newStart.setMinutes(startMinutes);
+  recurringEvent.start_time = new props.firebase.firestore.Timestamp.fromDate(newStart);
+  newEnd.setHours(endHour);
+  newEnd.setMinutes(endMinutes);
+  recurringEvent.end_time = new props.firebase.firestore.Timestamp.fromDate(newEnd);
+
+  // Create plain text recurring days string
+  recurringEvent.days.map(day => {
+    if(firstDay) {
+      recurringEventDays += getDayString(day) + 's';
+      firstDay = false;
+    } else {
+      recurringEventDays += ', ' + getDayString(day) + 's';
+    }
+  });
+  recurringEvent['daysString'] = recurringEventDays;
+
+  return recurringEvent;
+}
 
 function formatPhoneNumber(phoneNumberString) {
   var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
@@ -417,62 +478,13 @@ class GMap extends Component {
         .vendor(marker.vendor)
         .onSnapshot(vendor => {
           let vendorEvents = this.getCalendarEventsAtLocation(marker.location);
-          let nextEventDays = '';
-          let firstDay = true;
-          let nextEvent = vendorEvents[0];
 
-          if(nextEvent.recurring) {
-            const today = new Date();
-            const todayDay = today.getDay();
-            const startDate = nextEvent.start_time.toDate();
-            const startHour = startDate.getHours();
-            const startMinutes = startDate.getMinutes();
-            const endDate = nextEvent.end_time.toDate();
-            const endHour = endDate.getHours();
-            const endMinutes = endDate.getMinutes();
-            let newStart = new Date();
-            let newEnd = new Date();
-            let checkDay = todayDay;
-            let dateSet = false;
-
-            // Set start_time and end_time of next recurring event (closest to today)
-            // Go through event days array starting at index of todayDay
-            do {
-              let eventDay = (nextEvent.days.indexOf(checkDay) != -1) ? nextEvent.days[nextEvent.days.indexOf(checkDay)] : null;
-
-              if((eventDay === todayDay) && ((today.getHours() + today.getMinutes()*.01) < (endHour + endMinutes*.01))) {
-                // Happening today and hasn't ended yet - keep newStart and newEnd value of today
-                dateSet = true;
-              } else if(todayDay < eventDay) {
-                // If recurring day is greater than today, add days for new event dates
-                newStart = newStart.addDays(eventDay - todayDay)
-                newEnd = newEnd.addDays(eventDay - todayDay);
-                dateSet = true;
-              }
-              checkDay++;
-            } while(checkDay < 7 && !dateSet);
-            if(!dateSet) {
-              // If recurring day is less than today, add 7 - today day value + recurring day value for next event day
-              newStart = newStart.addDays(7 - todayDay + nextEvent.days[0]); // First recurring day in array is next event day
-              newEnd = newEnd.addDays(7 - todayDay + nextEvent.days[0]);
+          if(vendorEvents[0].recurring) {
+            // If next event is recurring then we need to calculate updated start_time for all recurring events to display correct order by date
+            for (var i = vendorEvents.length - 1; i >= 0; i--) {
+              if(vendorEvents[i].recurring) vendorEvents[i] = getNextDate(vendorEvents[i], this.props);
             }
-
-            newStart.setHours(startHour);
-            newStart.setMinutes(startMinutes);
-            nextEvent.start_time = new this.props.firebase.firestore.Timestamp.fromDate(newStart);
-            newEnd.setHours(endHour);
-            newEnd.setMinutes(endMinutes);
-            nextEvent.end_time = new this.props.firebase.firestore.Timestamp.fromDate(newEnd);
-            // Create plain text recurring days string
-            nextEvent.days.map(day => {
-              if(firstDay) {
-                nextEventDays += getDayString(day) + 's';
-                firstDay = false;
-              } else {
-                nextEventDays += ', ' + getDayString(day) + 's';
-              }
-            });
-            nextEvent['daysString'] = nextEventDays;
+            vendorEvents.sort((a, b) => (a.start_time > b.start_time) ? 1 : -1);
           }
 
           this.setState({
@@ -480,10 +492,10 @@ class GMap extends Component {
             infoLoading: false,
             infoData: {
               title: vendor.data().name,
-              address: nextEvent.address,
+              address: vendorEvents[0].address,
               phone: formatPhoneNumber(vendor.data().phone),
-              isOpen: this.isOpen(nextEvent),
-              nextEvent: nextEvent,
+              isOpen: this.isOpen(vendorEvents[0]),
+              nextEvent: vendorEvents[0],
               events: vendorEvents,
               photo: vendor.data().photo,
               facebook: vendor.data().facebook,
