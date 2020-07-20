@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { format, formatRelative } from 'date-fns';
 
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 import { CalendarList } from '../Calendar';
 
@@ -50,6 +50,7 @@ const CompactListItemIcon = withStyles({
   root: {
     minWidth: 32,
     marginTop: 5,
+    color: '#2699FB',
   },
 })(ListItemIcon);
 
@@ -58,6 +59,12 @@ const ListItemTextCenter = withStyles({
     textAlign: 'center',
   },
 })(ListItemText);
+
+const SocialIconButton = withStyles({
+  root: {
+    color: '#2699FB',
+  },
+})(IconButton);
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -83,7 +90,7 @@ export default function InfoWindow(props) {
         {infoData.title}
       </Title>
       <Grid container spacing={1}>
-        <Grid item xs={8}>
+        <Grid item xs>
           <List>
             <CompactListItem alignItems={'flex-start'} key="address" button onClick={() => openDirections(infoData.events[0].location)}>
               <CompactListItemIcon>
@@ -128,27 +135,29 @@ export default function InfoWindow(props) {
             </CompactListItem>
           </List>
         </Grid>
-        <Grid item xs={4} style={{marginTop: 8, textAlign: 'center'}}>
-          {infoData.photo &&
-            <img src={infoData.photo} style={{width:'100%'}} />
-          }
-          <Grid container justify="space-evenly" spacing={1}>
-            {infoData.instagram &&
-              <Grid item xs>
-                <IconButton size="small" onClick={() => window.open('https://www.instagram.com/'+infoData.instagram)} aria-label="Instagram">
-                  <InstagramIcon />
-                </IconButton>
-              </Grid>
+        {(infoData.photo || infoData.instagram || infoData.facebook) &&
+          <Grid item xs={4} style={{marginTop: 8, textAlign: 'center'}}>
+            {infoData.photo &&
+              <img src={infoData.photo} style={{width:'100%'}} />
             }
-            {infoData.facebook &&
-              <Grid item xs>
-                <IconButton size="small" onClick={() => window.open('https://www.facebook.com/'+infoData.facebook)} aria-label="Facebook">
-                  <FacebookIcon />
-                </IconButton>
-              </Grid>
-            }
+            <Grid container justify="space-evenly" spacing={1}>
+              {infoData.instagram &&
+                <Grid item xs>
+                  <SocialIconButton size="small" onClick={() => window.open('https://www.instagram.com/'+infoData.instagram)} aria-label="Instagram">
+                    <InstagramIcon />
+                  </SocialIconButton>
+                </Grid>
+              }
+              {infoData.facebook &&
+                <Grid item xs>
+                  <SocialIconButton size="small" onClick={() => window.open('https://www.facebook.com/'+infoData.facebook)} aria-label="Facebook">
+                    <FacebookIcon />
+                  </SocialIconButton>
+                </Grid>
+              }
+            </Grid>
           </Grid>
-        </Grid>
+        }
       </Grid>
       {infoData.events.length > 1 &&
         <List>

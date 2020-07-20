@@ -2,8 +2,6 @@ import React from 'react';
 
 import { format } from 'date-fns';
 
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
@@ -13,11 +11,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import EventIcon from '@material-ui/icons/Event';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-  },
-}));
 
 function getDayString(dayValue) {
   let weekday=new Array(7);
@@ -49,16 +42,14 @@ function getDaysString(days) {
 }
 
 export default function CalendarList(props) {
-  const classes = useStyles();
-  const theme = useTheme();
   const [calendar, setCalendar] = React.useState(props.calendar);
 
   return (
-    <List className={classes.root}>
+    <List>
     {calendar.map((event) => (
-      <ListItem key={event.uid}>
+      <ListItem alignItems="flex-start" key={event.uid}>
         <ListItemIcon>
-          <EventIcon />
+          <EventIcon color="primary" />
         </ListItemIcon>
         <ListItemText
           primary={event.recurring ? event.daysString : format(event.start_time.toDate(), 'EEEE, MMMM do')}

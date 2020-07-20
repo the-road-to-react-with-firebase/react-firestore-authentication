@@ -60,16 +60,16 @@ const TopButton = styled(IconButton)({
       : '2px solid #2699FB',
   color: (props) =>
     props.selected
-      ? 'white'
-      : '#333333',
+      ? '#ffffff'
+      : '#2699FB',
 });
 const ButtonText = styled(Typography)({
   color: (props) =>
     props.selected
       ? '#2699FB'
-      : '#333333',
+      : '#555555',
   fontWeight: 500,
-  textShadow: '0 0 2px #ffffff, 0 0 5px #ffffff',
+  textShadow: '0 0 2px #ebf5fe, 0 0 10px #fff',
 });
 
 const DialogContainer = styled(Container)({
@@ -341,9 +341,8 @@ class GMap extends Component {
 
         if(hours[0] < currentEndHour && hours[1] > currentStartHour) {
           filteredResults.push(currentEvent);
-        }
-        // Check for additionalHours for this event
-        if(currentEvent.additionalHours) {
+        } else if(currentEvent.additionalHours) {
+          // Check for additionalHours for this event
           const additionalHours = currentEvent.additionalHours;
           let a = 0;
 
