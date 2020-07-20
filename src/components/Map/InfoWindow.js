@@ -121,7 +121,7 @@ export default function InfoWindow(props) {
       <Title variant="h5" component="h2">
         {infoData.title}
       </Title>
-      <Grid container spacing={1}>
+      <Grid container>
         <Grid item xs>
           <List>
             <CompactListItem alignItems={'flex-start'} key="address" button onClick={() => openDirections(infoData.events[0].location)}>

@@ -678,16 +678,14 @@ class GMap extends Component {
                   this.setSelected(null);
                 }}
               >
-                <div>
-                  {infoLoading
-                    ? <Spinner />
-                    : <InfoWindowVendor
-                        infoData={infoData}
-                        firebase={this.props.firebase}
-                        onRender={(height) => {this.state.mapRef.panBy(0, (-height/2 - headerHeight))}}
-                      />
-                  }
-                </div>
+                {infoLoading
+                  ? <Spinner />
+                  : <InfoWindowVendor
+                      infoData={infoData}
+                      firebase={this.props.firebase}
+                      onRender={(height) => {this.state.mapRef.panBy(0, (-height/2 - headerHeight))}}
+                    />
+                }
               </InfoWindow>
             ) : null}
           </GoogleMap>
