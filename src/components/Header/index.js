@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     color: '#2699FB',
+    textShadow: '1px 1px 1px #fff',
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
