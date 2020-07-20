@@ -275,8 +275,9 @@ class GMap extends Component {
       } else if (result.length > 1) {
         // Check for all vendor events at same location
         let locations = []
+        let i = 0;
 
-        for (var i = result.length - 1; i >= 0; i--) {
+        for (i; i < result.length; i++) {
           let locationString = result[i].latitude + ',' + result[i].longitude;
           if(locations.indexOf(locationString) === -1) locations.push(locationString);
         }
@@ -297,7 +298,7 @@ class GMap extends Component {
   filterCalendarByTime = (dates, hours) => {
     // Filters calendar events for specific dates and/or hours
     let dateResults = [];
-    let filteredResults = [];
+    let hourResults = [];
     const currentCalendar = this.state.selectedVendor ? this.state.vendorFilteredCalendar : this.state.fullCalendar;
 
     // Date filter
@@ -307,7 +308,7 @@ class GMap extends Component {
       const endDateFilter = (!dates[1]) ? startDateFilter : new Date(dates[1].getTime());
       const filterDays = getDaysInRange(startDateFilter, endDateFilter);
 
-      for (i = currentCalendar.length - 1; i >= 0; i--) {
+      for (i; i < currentCalendar.length; i++) {
         if(currentCalendar[i].recurring) {
           // Check if some of event days are within filter range
           if(
@@ -316,7 +317,7 @@ class GMap extends Component {
               // Filter recurring events by the days of the week selected in the date filter
               let r = 0;
               
-              for (r = currentCalendar[i].days.length - 1; r >= 0; r--) {
+              for (r; r < currentCalendar[i].days.length; r++) {
                 if(filterDays.includes(currentCalendar[i].days[r])) {
                   dateResults.push(currentCalendar[i]);
                   r = -1;
@@ -338,37 +339,37 @@ class GMap extends Component {
       const tempCalendar = dateResults;
       let i = 0;
 
-      for (i = tempCalendar.length - 1; i >= 0; i--) {
+      for (i; i < tempCalendar.length; i++) {
         const currentEvent = tempCalendar[i];
         const currentStartHour = currentEvent.start_time.toDate().getHours();
         const currentEndHour = currentEvent.end_time.toDate().getHours();
 
         if(hours[0] < currentEndHour && hours[1] > currentStartHour) {
-          filteredResults.push(currentEvent);
+          hourResults.push(currentEvent);
         } else if(currentEvent.additionalHours) {
           // Check for additionalHours for this event
           const additionalHours = currentEvent.additionalHours;
           let a = 0;
 
-          for (a = additionalHours.length - 1; a >= 0; a--) {
+          for (a; a < additionalHours.length; a++) {
             const currentStartHour = additionalHours[a].start_time.toDate().getHours();
             const currentEndHour = additionalHours[a].end_time.toDate().getHours();
 
             if(hours[0] < currentEndHour && hours[1] > currentStartHour) {
-              filteredResults.push(currentEvent);
+              hourResults.push(currentEvent);
             }
           }
         }
       }
     } else {
-      filteredResults = dateResults;
+      hourResults = dateResults;
     }
 
-    if(filteredResults.length === 0) alert('No events found matching your search.');
-    if(filteredResults.length === 1) this.setSelected(filteredResults[0]);
+    if(hourResults.length === 0) alert('No events found matching your search.');
+    if(hourResults.length === 1) this.setSelected(hourResults[0]);
     
-    this.setState({calendar: filteredResults});
-    this.setNewBounds(filteredResults);
+    this.setState({calendar: hourResults});
+    this.setNewBounds(hourResults);
   }
 
   getCalendarEventsAtLocation = (location) => {
