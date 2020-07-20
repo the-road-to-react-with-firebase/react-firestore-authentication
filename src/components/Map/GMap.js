@@ -695,13 +695,13 @@ class GMap extends Component {
               TransitionComponent={Transition}
             >
               <DialogToolbar>
-                <IconButton edge="start" color="inherit" onClick={this.onModalClose} aria-label="close">
+                <IconButton edge="start" color="inherit" onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } aria-label="clear search">
                   <CloseIcon />
                 </IconButton>
                 <Typography variant="h6" id="modal-search-title">
                   Vendor Search
                 </Typography>
-                <IconButton edge="end" color="inherit" onClick={this.onModalClose} aria-label="close">
+                <IconButton edge="end" color="inherit" onClick={this.onModalClose} aria-label="close search">
                   <DoneIcon />
                 </IconButton>
               </DialogToolbar>
