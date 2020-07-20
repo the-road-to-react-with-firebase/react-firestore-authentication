@@ -74,6 +74,7 @@ export default function InfoWindow(props) {
   const observed = useRef(null);
   const [infoData, setInfoData] = useState(props.infoData);
   const [modalOpen, setModalOpen] = useState(false);
+  const firebase = props.firebase;
 
   useEffect(() => {
     props.onRender((observed.current.clientHeight === 0) ? 300 : observed.current.clientHeight); // Todo: first render isn't firing correctly. Need to fix then remove this conditional statement
@@ -82,6 +83,37 @@ export default function InfoWindow(props) {
   function openDirections(location) {
     // Opens google maps directions in new window with specified location as the endpoint
     window.open('https://www.google.com/maps/dir/?api=1&destination='+location.latitude+','+location.longitude);
+    
+    firebase.analytics.logEvent('get_directions', {
+      location_id: infoData.nextEvent.uid,
+      location_address: infoData.nextEvent.address,
+      vendor_id: infoData.nextEvent.vendor,
+      vendor: infoData.title,
+    });
+  }
+
+  function callPhone(number) {
+    window.open('tel:' + number);
+
+    firebase.analytics.logEvent('call_number', {
+      location_id: infoData.nextEvent.uid,
+      location_address: infoData.nextEvent.address,
+      vendor_id: infoData.nextEvent.vendor,
+      vendor: infoData.title,
+      phone: number,
+    });
+  }
+
+  function openSocial(platform, url) {
+    window.open(url);
+
+    firebase.analytics.logEvent(('visit_'+platform), {
+      location_id: infoData.nextEvent.uid,
+      location_address: infoData.nextEvent.address,
+      vendor_id: infoData.nextEvent.vendor,
+      vendor: infoData.title,
+      url: url,
+    });
   }
 
   return (
@@ -99,7 +131,7 @@ export default function InfoWindow(props) {
               <ListItemText primary={infoData.address} />
             </CompactListItem>
             {infoData.phone &&
-              <CompactListItem alignItems={'flex-start'} key="phone" button onClick={() => window.open('tel:' + infoData.phone)}>
+              <CompactListItem alignItems={'flex-start'} key="phone" button onClick={() => callPhone(infoData.phone)}>
                 <CompactListItemIcon>
                   <PhoneIcon />
                 </CompactListItemIcon>
@@ -143,14 +175,14 @@ export default function InfoWindow(props) {
             <Grid container justify="space-evenly" spacing={1}>
               {infoData.instagram &&
                 <Grid item xs>
-                  <SocialIconButton size="small" onClick={() => window.open('https://www.instagram.com/'+infoData.instagram)} aria-label="Instagram">
+                  <SocialIconButton size="small" onClick={() => openSocial('instagram', 'https://www.instagram.com/'+infoData.instagram)} aria-label="Instagram">
                     <InstagramIcon />
                   </SocialIconButton>
                 </Grid>
               }
               {infoData.facebook &&
                 <Grid item xs>
-                  <SocialIconButton size="small" onClick={() => window.open('https://www.facebook.com/'+infoData.facebook)} aria-label="Facebook">
+                  <SocialIconButton size="small" onClick={() => openSocial('facebook', 'https://www.facebook.com/'+infoData.facebook)} aria-label="Facebook">
                     <FacebookIcon />
                   </SocialIconButton>
                 </Grid>

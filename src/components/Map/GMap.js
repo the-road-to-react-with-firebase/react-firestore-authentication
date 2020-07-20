@@ -502,6 +502,13 @@ class GMap extends Component {
               instagram: vendor.data().instagram,
             }
           });
+
+          this.props.firebase.analytics.logEvent('marker_selected', {
+            location_id: marker.uid,
+            location_address: vendorEvents[0].address,
+            vendor_id: marker.vendor,
+            vendor: vendor.data().name,
+          });
         }, err => {
           console.log('No such vendor!');
         });
@@ -566,6 +573,14 @@ class GMap extends Component {
     let filterStatus = false;
     if(dates[0] || (hours[0] !== 0 && hours[1] !== 24)) {
       filterStatus = true;
+      this.props.firebase.analytics.logEvent('filter_cleared');
+    } else {
+      this.props.firebase.analytics.logEvent('filter_applied', {
+        start_hour: hours[0],
+        end_hour: hours[1],
+        start_date: dates[0],
+        end_date: dates[1],
+      });
     }
     this.filterCalendarByTime(dates, hours);
     this.setState({
@@ -593,6 +608,7 @@ class GMap extends Component {
           this.setNewBounds(this.state.calendar);
         }
       });
+      this.props.firebase.analytics.logEvent('search_cleared');
     } else {
       // Valid vendor selected
       this.setState({
@@ -601,6 +617,7 @@ class GMap extends Component {
       }, () => this.filterCalendarByVendor(selected.uid));
 
       this.onModalClose();
+      this.props.firebase.analytics.logEvent('search_vendor', { vendor_id: selected.uid, vendor: selected.vendor });
     }
   }
 
@@ -666,7 +683,9 @@ class GMap extends Component {
                     ? <Spinner />
                     : <InfoWindowVendor
                         infoData={infoData}
-                        onRender={(height) => {this.state.mapRef.panBy(0, (-height/2 - headerHeight))}} />
+                        firebase={this.props.firebase}
+                        onRender={(height) => {this.state.mapRef.panBy(0, (-height/2 - headerHeight))}}
+                      />
                   }
                 </div>
               </InfoWindow>
