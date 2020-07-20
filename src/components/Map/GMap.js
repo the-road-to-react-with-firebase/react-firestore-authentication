@@ -198,9 +198,13 @@ class GMap extends Component {
       .onSnapshot(snapshot => {
         let calendar = [];
 
-        snapshot.forEach(doc =>
-          calendar.push({ ...doc.data(), uid: doc.id }),
-        );
+        snapshot.forEach(event =>{
+          const eventData = event.data();
+
+          if(eventData.recurring) {
+            if(eventData.recurring_end.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
+          } else if(eventData.end_time.toDate() > timeNow) calendar.push({ ...eventData, uid: event.id })
+        });
 
         if(this.state.loading) {
           this.setNewBounds(calendar);
