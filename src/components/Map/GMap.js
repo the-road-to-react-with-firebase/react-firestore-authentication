@@ -29,6 +29,8 @@ import AppBar from '@material-ui/core/AppBar';
 
 import Filter from '../Filter';
 
+import Snackbar from '@material-ui/core/Snackbar';
+
 import { GoogleMap, LoadScript, InfoWindow, Marker } from '@react-google-maps/api';
 
 import { Spinner } from '../Loading';
@@ -758,14 +760,21 @@ class GMap extends Component {
             {locationLoading ? 'Finding Location...' : 'Find My Location' }
             </ButtonText>
           </Grid>
-          {refresh &&
-            <Grid item xs={12}>
-              <Button onClick={this.refreshMap}>
-                Events Updated. Refresh map
-              </Button>
-            </Grid>
-          }
-          
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            open={refresh}
+            message="Map updated. Please refresh to see latest info."
+            action={
+              <React.Fragment>
+                <Button color="secondary" size="small" onClick={this.refreshMap}>
+                  Refresh Map
+                </Button>
+              </React.Fragment>
+            }
+          />
         </ButtonGrid>
       </div>
     )
