@@ -52,7 +52,6 @@ export default function CalendarList(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [calendar, setCalendar] = React.useState(props.calendar);
-  console.log(calendar);
 
   return (
     <List className={classes.root}>
@@ -63,11 +62,12 @@ export default function CalendarList(props) {
         </ListItemIcon>
         <ListItemText
           primary={event.recurring ? event.daysString : format(event.start_time.toDate(), 'EEEE, MMMM do')}
+          secondaryTypographyProps={{component:'div'}}
           secondary={
             <React.Fragment>
               <div>{ format(event.start_time.toDate(), 'p')+ format(event.end_time.toDate(), ' - p') }</div>
-              {event.additionalHours && (event.additionalHours.map((hour) => (
-                <div>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
+              {event.additionalHours && (event.additionalHours.map((hour, index) => (
+                <div key={index}>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
               )))}
             </React.Fragment>
           }

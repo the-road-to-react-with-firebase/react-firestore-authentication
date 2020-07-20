@@ -79,11 +79,12 @@ export default function InfoWindow(props) {
           </ListItemIcon>
           <ListItemText
             primary={infoData.nextEvent.recurring ? infoData.nextEvent.daysString : format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do')}
+            secondaryTypographyProps={{component:'div'}}
             secondary={
               <React.Fragment>
                 <div>{ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }</div>
-                {infoData.nextEvent.additionalHours && (infoData.nextEvent.additionalHours.map((hour) => (
-                  <div>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
+                {infoData.nextEvent.additionalHours && (infoData.nextEvent.additionalHours.map((hour, index) => (
+                  <div key={index}>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
                 )))}
               </React.Fragment>
             }
@@ -95,9 +96,8 @@ export default function InfoWindow(props) {
               key="calendar"
               button
               onClick={() => setModalOpen(true)}>
-                <ListItemIcon>
-                </ListItemIcon>
                 <ListItemText
+                  inset
                   primary={(infoData.events.length-1) + ' other event' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
                   secondary='View all dates and times'
                 />

@@ -416,7 +416,6 @@ class GMap extends Component {
           let nextEventDays = '';
           let firstDay = true;
           let nextEvent = vendorEvents[0];
-          console.log(vendorEvents)
 
           if(nextEvent.recurring) {
             const today = new Date();
