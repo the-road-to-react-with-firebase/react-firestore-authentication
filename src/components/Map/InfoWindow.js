@@ -77,18 +77,17 @@ export default function InfoWindow(props) {
           <ListItemIcon>
             <EventIcon />
           </ListItemIcon>
-          {infoData.nextEvent.recurring
-            ? 
-              <ListItemText
-                primary={infoData.nextEvent.daysString}
-                secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
-              />
-            :
-              <ListItemText
-                primary={ format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do') }
-                secondary={ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }
-              />
-          }
+          <ListItemText
+            primary={infoData.nextEvent.recurring ? infoData.nextEvent.daysString : format(infoData.nextEvent.start_time.toDate(), 'EEEE, MMMM do')}
+            secondary={
+              <React.Fragment>
+                <div>{ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }</div>
+                {infoData.nextEvent.additionalHours && (infoData.nextEvent.additionalHours.map((hour) => (
+                  <div>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
+                )))}
+              </React.Fragment>
+            }
+          />
         </ListItem>
         {infoData.events.length > 1 &&
           <div>

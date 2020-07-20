@@ -335,11 +335,26 @@ class GMap extends Component {
       let i = 0;
 
       for (i = tempCalendar.length - 1; i >= 0; i--) {
-        const currentStartHour = tempCalendar[i].start_time.toDate().getHours();
-        const currentEndHour = tempCalendar[i].end_time.toDate().getHours();
+        const currentEvent = tempCalendar[i];
+        const currentStartHour = currentEvent.start_time.toDate().getHours();
+        const currentEndHour = currentEvent.end_time.toDate().getHours();
 
         if(hours[0] < currentEndHour && hours[1] > currentStartHour) {
-          filteredResults.push(tempCalendar[i]);
+          filteredResults.push(currentEvent);
+        }
+        // Check for additionalHours for this event
+        if(currentEvent.additionalHours) {
+          const additionalHours = currentEvent.additionalHours;
+          let a = 0;
+
+          for (a = additionalHours.length - 1; a >= 0; a--) {
+            const currentStartHour = additionalHours[a].start_time.toDate().getHours();
+            const currentEndHour = additionalHours[a].end_time.toDate().getHours();
+
+            if(hours[0] < currentEndHour && hours[1] > currentStartHour) {
+              filteredResults.push(currentEvent);
+            }
+          }
         }
       }
     } else {

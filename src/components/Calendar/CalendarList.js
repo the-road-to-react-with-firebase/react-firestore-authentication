@@ -61,18 +61,17 @@ export default function CalendarList(props) {
         <ListItemIcon>
           <EventIcon />
         </ListItemIcon>
-        {event.recurring
-          ? 
-            <ListItemText
-              primary={getDaysString(event.days)}
-              secondary={ format(event.start_time.toDate(), 'p')+ format(event.end_time.toDate(), ' - p') }
-            />
-          :
-            <ListItemText
-              primary={ format(event.start_time.toDate(), 'EEEE, MMMM do') }
-              secondary={ format(event.start_time.toDate(), 'p')+ format(event.end_time.toDate(), ' - p') }
-            />
-        }
+        <ListItemText
+          primary={event.recurring ? event.daysString : format(event.start_time.toDate(), 'EEEE, MMMM do')}
+          secondary={
+            <React.Fragment>
+              <div>{ format(event.start_time.toDate(), 'p')+ format(event.end_time.toDate(), ' - p') }</div>
+              {event.additionalHours && (event.additionalHours.map((hour) => (
+                <div>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
+              )))}
+            </React.Fragment>
+          }
+        />
       </ListItem>
     ))}
     </List>
