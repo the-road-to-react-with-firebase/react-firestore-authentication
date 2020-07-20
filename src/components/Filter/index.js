@@ -192,13 +192,13 @@ export default function CalendarFilter(props) {
   return (
     <div>
       <DialogToolbar>
-        <IconButton edge="start" color="inherit" onClick={() => { returnFilters([0,24], 'any', [null,null]) }} aria-label="close">
+        <IconButton edge="start" color="inherit" onClick={() => { returnFilters([0,24], 'any', [null,null]) }} aria-label="clear filters">
           <CloseIcon />
         </IconButton>
         <Typography variant="h6" id="modal-filter-title">
           Filters
         </Typography>
-        <IconButton edge="end" color="inherit" onClick={() => { returnFilters(hoursValue, time, selectedDate) }} aria-label="close">
+        <IconButton edge="end" color="inherit" onClick={() => { returnFilters(hoursValue, time, selectedDate) }} aria-label="apply filters">
           <DoneIcon />
         </IconButton>
       </DialogToolbar>
