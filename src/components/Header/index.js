@@ -7,6 +7,8 @@ import SignOutButton from '../SignOut';
 import * as ROUTES from '../../constants/routes';
 import * as ROLES from '../../constants/roles';
 
+import FoodFinderLogo from '../SVG/food-finder-logo.svg';
+
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -31,8 +33,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   appBar: {
-    color: '#2699FB',
-    textShadow: '1px 1px 1px #fff',
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -43,13 +43,15 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: '0 auto',
-    textTransform: 'uppercase',
-    fontFamily: 'Arial Rounded MT Bold,Helvetica Rounded,Arial,sans-serif',
-    fontSize: '1.1rem',
+    '-webkit-filter': 'drop-shadow( 1px 1px 0px #fff)',
+    filter: 'drop-shadow( 1px 1px 0px #fff)',
   },
   menuButton: {
     left: theme.spacing(2),
     position: 'absolute',
+    color: '#2699FB',
+    '-webkit-filter': 'drop-shadow( 1px 1px 0px #fff)',
+    filter: 'drop-shadow( 1px 1px 0px #fff)',
   },
   hide: {
     display: 'none',
@@ -195,9 +197,7 @@ export default function Header() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h5" component="h1" noWrap className={clsx(classes.title)}>
-            Fair Food Finder
-          </Typography>
+          <img className={clsx(classes.title)} src={FoodFinderLogo} alt="Fair Food Finder" />
         </Toolbar>
       </AppBar>
       <Drawer open={open}>
