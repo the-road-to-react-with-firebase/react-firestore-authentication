@@ -5,6 +5,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { lightBlue } from '@material-ui/core/colors';
 
+import Page from '../PageView';
 import Header from '../Header';
 import LandingPage from '../Landing';
 import AboutPage from '../About';
@@ -16,6 +17,7 @@ import AccountPage from '../Account';
 import AdminPage from '../Admin';
 
 import * as ROUTES from '../../constants/routes';
+import * as ROUTE_TITLES from '../../constants/titles';
 import { withAuthentication } from '../Session';
 
 const theme = createMuiTheme({
@@ -26,14 +28,29 @@ const theme = createMuiTheme({
   },
 });
 
-function App () {
+function App (props) {
   return (
     <Router>
       <ThemeProvider theme={theme}>
         <Header />
-
-        <Route exact path={ROUTES.LANDING} component={LandingPage} />
-        <Route path={ROUTES.ABOUT} component={AboutPage} />
+        <Route
+          path={ROUTES.ABOUT}
+          render={() => (
+            <Page title={ROUTE_TITLES.ABOUT} firebase={props.firebase} >
+              <AboutPage />
+            </Page>
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.LANDING}
+          render={() => (
+            <Page title={ROUTE_TITLES.LANDING} firebase={props.firebase} >
+              <LandingPage />
+            </Page>
+          )}
+        />
+        
         <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
         <Route path={ROUTES.SIGN_IN} component={SignInPage} />
         <Route
