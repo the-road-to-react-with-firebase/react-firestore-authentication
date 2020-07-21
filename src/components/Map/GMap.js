@@ -632,6 +632,7 @@ class GMap extends Component {
           this.setNewBounds(this.state.calendar);
         }
       });
+      
       this.props.firebase.analytics.logEvent('search_cleared');
     } else {
       // Valid vendor selected
@@ -640,7 +641,7 @@ class GMap extends Component {
         selectedVendor: selected,
       }, () => this.filterCalendarByVendor(selected.uid));
 
-      this.props.firebase.analytics.logEvent('search_vendor', { vendor_id: selected.uid, vendor: selected.vendor });
+      this.props.firebase.analytics.logEvent('search_vendor', { vendor_id: selected.uid, vendor: selected.name });
     }
   }
 
