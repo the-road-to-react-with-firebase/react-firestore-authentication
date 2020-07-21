@@ -331,9 +331,11 @@ class GMap extends Component {
       this.setNewBounds(result);
 
       if(result.length === 1) {
+        this.onModalClose();
         // Set selected marker to vendor if there is only one marker
-        this.setSelected(result[0])
+        this.setSelected(result[0]);
       } else if (result.length > 1) {
+        this.onModalClose();
         // Check for all vendor events at same location
         let locations = []
         let i = 0;
@@ -344,10 +346,10 @@ class GMap extends Component {
         }
         if(locations.length === 1) {
           // Set selected marker to vendor if there is only one location
-          this.setSelected(result[0])
+          this.setSelected(result[0]);
         } else {
           // Multiple locations for the vendor; Don't set selected marker
-          this.setSelected(null)
+          this.setSelected(null);
         }
       } else {
         alert('This vendor does not have any active events.');
@@ -426,8 +428,30 @@ class GMap extends Component {
       hourResults = dateResults;
     }
 
-    if(hourResults.length === 0) alert('No events found matching your search.');
-    if(hourResults.length === 1) this.setSelected(hourResults[0]);
+    if(hourResults.length === 0) {
+      alert('No events found matching your search.');
+      if(this.state.selectedVendor) {
+        // Vendor search + filter applied
+      }
+    } else {
+      if(hourResults.length === 1) this.setSelected(hourResults[0]);  
+      if(this.state.modalOpen) this.onModalClose();
+      if(this.state.filterModalOpen) this.onFilterModalClose();
+
+      
+      // Check for all vendor events at same location
+      let locations = []
+      let i = 0;
+      for (i; i < hourResults.length; i++) {
+        let locationString = hourResults[i].latitude + ',' + hourResults[i].longitude;
+        if(locations.indexOf(locationString) === -1) locations.push(locationString);
+      }
+      if(locations.length === 1) {
+        // Set selected marker  if there is only one location
+        this.setSelected(hourResults[0]);
+      }
+    }
+    
     
     this.setState({calendar: hourResults});
     this.setNewBounds(hourResults);
@@ -582,7 +606,6 @@ class GMap extends Component {
         end_date: dates[1],
       });
     }
-    this.filterCalendarByTime(dates, hours);
     this.setState({
       filteredHours: hours,
       filteredHoursToggle: toggle,
@@ -590,7 +613,7 @@ class GMap extends Component {
       filterSet: filterStatus,
       selected: null,
     });
-    this.onFilterModalClose();
+    this.filterCalendarByTime(dates, hours);
   }
 
   setSelectedVendor = (selected) => {
@@ -605,6 +628,7 @@ class GMap extends Component {
           // Rerun date filters
           this.filterCalendarByTime(this.state.filteredDates, this.state.filteredHours);
         } else {
+          this.onModalClose();
           this.setNewBounds(this.state.calendar);
         }
       });
@@ -616,7 +640,6 @@ class GMap extends Component {
         selectedVendor: selected,
       }, () => this.filterCalendarByVendor(selected.uid));
 
-      this.onModalClose();
       this.props.firebase.analytics.logEvent('search_vendor', { vendor_id: selected.uid, vendor: selected.vendor });
     }
   }
@@ -712,7 +735,7 @@ class GMap extends Component {
               TransitionComponent={Transition}
             >
               <DialogToolbar>
-                <IconButton edge="start" color="inherit" onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } aria-label="clear search">
+                <IconButton edge="start" color="inherit" onClick={() => {this.setSelectedVendor(null)} } aria-label="clear search">
                   <CloseIcon />
                 </IconButton>
                 <Typography variant="h6" id="modal-search-title">
@@ -737,7 +760,7 @@ class GMap extends Component {
                       <Actions onClick={this.onModalClose} fullWidth variant="contained" color="primary">
                         Find Vendor
                       </Actions>
-                      <Actions onClick={() => {this.onModalClose(); this.setSelectedVendor(null);} } fullWidth>
+                      <Actions onClick={() => {this.setSelectedVendor(null)} } fullWidth>
                         Clear Search
                       </Actions>
                     </ActionsBar>
