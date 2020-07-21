@@ -33,10 +33,12 @@ import InstagramIcon from '@material-ui/icons/Instagram';
 
 const Title = withStyles({
   root: {
+    marginLeft: 4,
     textTransform: 'uppercase',
-    fontFamily: 'Arial Rounded MT Bold,Helvetica Rounded,Arial,sans-serif',
-    fontSize: '1.3rem',
+    fontWeight: 500,
+    fontSize: '1.4rem',
     color: '#2699FB',
+    textShadow: '1px 1px 2px #cecece',
   },
 })(Typography);
 
