@@ -7,6 +7,7 @@ import { lightBlue } from '@material-ui/core/colors';
 
 import Header from '../Header';
 import LandingPage from '../Landing';
+import AboutPage from '../About';
 import SignUpPage from '../SignUp';
 import SignInPage from '../SignIn';
 import PasswordForgetPage from '../PasswordForget';
@@ -32,6 +33,7 @@ function App () {
         <Header />
 
         <Route exact path={ROUTES.LANDING} component={LandingPage} />
+        <Route path={ROUTES.ABOUT} component={AboutPage} />
         <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
         <Route path={ROUTES.SIGN_IN} component={SignInPage} />
         <Route

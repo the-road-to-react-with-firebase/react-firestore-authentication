@@ -168,6 +168,14 @@ export default function Header() {
             <ListItemText primary="Food Finder Map" />
           </ListItem>
         </Link>
+        <Link to={ROUTES.ABOUT}>
+          <ListItem
+            button
+          >
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="About" />
+          </ListItem>
+        </Link>
         <Link to={ROUTES.SIGN_IN}>
           <ListItem
             button
