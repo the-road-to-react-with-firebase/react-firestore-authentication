@@ -381,7 +381,7 @@ class GMap extends Component {
               for (r; r < currentCalendar[i].days.length; r++) {
                 if(filterDays.includes(currentCalendar[i].days[r])) {
                   dateResults.push(currentCalendar[i]);
-                  r = -1;
+                  r = currentCalendar[i].days.length;
                 } 
               }
           }
