@@ -38,7 +38,7 @@ const Title = withStyles({
     fontWeight: 500,
     fontSize: '1.4rem',
     color: '#2699FB',
-    textShadow: '1px 1px 2px #cecece',
+    textShadow: '1px 1px 2px #eee',
   },
 })(Typography);
 
