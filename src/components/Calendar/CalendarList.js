@@ -60,6 +60,11 @@ export default function CalendarList(props) {
               {event.additionalHours && (event.additionalHours.map((hour, index) => (
                 <div key={index}>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
               )))}
+              {event.recurring_end && (event.recurring_end.toMillis() <= (new Date().getTime() + (7 * 24 * 60 * 60 * 1000))) && // recurring end date is within next 7 days
+                <div>
+                  {'Through ' + format(event.recurring_end.toDate(), 'P')}
+                </div>
+              }
             </React.Fragment>
           }
         />

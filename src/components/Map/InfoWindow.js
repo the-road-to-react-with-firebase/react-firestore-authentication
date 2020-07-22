@@ -200,10 +200,19 @@ export default function InfoWindow(props) {
                 secondaryTypographyProps={{component:'div'}}
                 secondary={
                   <React.Fragment>
-                    <div>{ format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p') }</div>
+                    <div>
+                    {
+                      format(infoData.nextEvent.start_time.toDate(), 'p')+ format(infoData.nextEvent.end_time.toDate(), ' - p')
+                    }
+                    </div>
                     {infoData.nextEvent.additionalHours && (infoData.nextEvent.additionalHours.map((hour, index) => (
                       <div key={index}>{ format(hour.start_time.toDate(), 'p')+ format(hour.end_time.toDate(), ' - p') }</div>
                     )))}
+                    {infoData.nextEvent.recurring_end && (infoData.nextEvent.recurring_end.toMillis() <= (new Date().getTime() + (7 * 24 * 60 * 60 * 1000))) && // recurring end date is within next 7 days
+                      <div>
+                        {'Through ' + format(infoData.nextEvent.recurring_end.toDate(), 'P')}
+                      </div>
+                    }
                   </React.Fragment>
                 }
               />
