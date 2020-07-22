@@ -19,6 +19,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 
 import DirectionsIcon from '@material-ui/icons/Directions';
 import PhoneIcon from '@material-ui/icons/Phone';
+import LanguageIcon from '@material-ui/icons/Language';
+import RestaurantMenuIcon from '@material-ui/icons/RestaurantMenu';
 import ScheduleIcon from '@material-ui/icons/Schedule';
 import EventIcon from '@material-ui/icons/Event';
 
@@ -83,20 +85,18 @@ export default function InfoWindow(props) {
   }, [observed]);
 
   function openDirections(location) {
-    // Opens google maps directions in new window with specified location as the endpoint
-    window.open('https://www.google.com/maps/dir/?api=1&destination='+location.latitude+','+location.longitude);
-    
     firebase.analytics.logEvent('get_directions', {
       location_id: infoData.nextEvent.uid,
       location_address: infoData.nextEvent.address,
       vendor_id: infoData.nextEvent.vendor,
       vendor: infoData.title,
     });
+
+    // Opens google maps directions in new window with specified location as the endpoint
+    window.open('https://www.google.com/maps/dir/?api=1&destination='+location.latitude+','+location.longitude);
   }
 
   function callPhone(number) {
-    window.open('tel:' + number);
-
     firebase.analytics.logEvent('call_number', {
       location_id: infoData.nextEvent.uid,
       location_address: infoData.nextEvent.address,
@@ -104,11 +104,35 @@ export default function InfoWindow(props) {
       vendor: infoData.title,
       phone: number,
     });
+
+    window.open('tel:' + number);
+  }
+
+  function openWebsite(link) {
+    firebase.analytics.logEvent('view_website', {
+      location_id: infoData.nextEvent.uid,
+      location_address: infoData.nextEvent.address,
+      vendor_id: infoData.nextEvent.vendor,
+      vendor: infoData.title,
+      website: link,
+    });
+
+    window.open(link);
+  }
+
+  function openMenu(link) {
+    firebase.analytics.logEvent('view_menu', {
+      location_id: infoData.nextEvent.uid,
+      location_address: infoData.nextEvent.address,
+      vendor_id: infoData.nextEvent.vendor,
+      vendor: infoData.title,
+      menu: link,
+    });
+
+    window.open(link);
   }
 
   function openSocial(platform, url) {
-    window.open(url);
-
     firebase.analytics.logEvent(('visit_'+platform), {
       location_id: infoData.nextEvent.uid,
       location_address: infoData.nextEvent.address,
@@ -116,6 +140,8 @@ export default function InfoWindow(props) {
       vendor: infoData.title,
       url: url,
     });
+
+    window.open(url);
   }
 
   return (
@@ -138,6 +164,21 @@ export default function InfoWindow(props) {
                   <PhoneIcon />
                 </CompactListItemIcon>
                 <ListItemText primary={infoData.phone} />
+              </CompactListItem>
+            }
+            {infoData.website &&
+              <CompactListItem alignItems={'flex-start'} key="website" button onClick={() => openWebsite(infoData.website)}>
+                <CompactListItemIcon>
+                  <LanguageIcon />
+                </CompactListItemIcon>
+                <ListItemText primary={infoData.website} />
+              </CompactListItem>
+            }{infoData.menu &&
+              <CompactListItem alignItems={'flex-start'} key="menu" button onClick={() => openMenu(infoData.menu)}>
+                <CompactListItemIcon>
+                  <RestaurantMenuIcon />
+                </CompactListItemIcon>
+                <ListItemText primary="View menu" />
               </CompactListItem>
             }
             <CompactListItem alignItems={'flex-start'} key="open">

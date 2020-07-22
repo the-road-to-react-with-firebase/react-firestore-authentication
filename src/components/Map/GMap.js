@@ -518,6 +518,8 @@ class GMap extends Component {
               title: vendor.data().name,
               address: vendorEvents[0].address,
               phone: formatPhoneNumber(vendor.data().phone),
+              website: vendor.data().website,
+              menu: vendor.data().menu,
               isOpen: this.isOpen(vendorEvents[0]),
               nextEvent: vendorEvents[0],
               events: vendorEvents,
@@ -632,7 +634,7 @@ class GMap extends Component {
           this.setNewBounds(this.state.calendar);
         }
       });
-      
+
       this.props.firebase.analytics.logEvent('search_cleared');
     } else {
       // Valid vendor selected
