@@ -250,7 +250,7 @@ export default function InfoWindow(props) {
             button
             onClick={() => setModalOpen(true)}>
               <ListItemTextCenter
-                primary={(infoData.events.length-1) + ' other event' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
+                primary={(infoData.events.length-1) + ' other time' + ((infoData.events.length-1 === 1) ? '' : 's') + ' at this location'}
                 secondary='View all dates and times'
               />
             </CompactListItem>
@@ -266,7 +266,7 @@ export default function InfoWindow(props) {
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="h6" id="modal-calendar-title">
-                    All events at this location
+                    All dates and times at this location
                   </Typography>
                 </Toolbar>
                 <CalendarList calendar={infoData.events} />
