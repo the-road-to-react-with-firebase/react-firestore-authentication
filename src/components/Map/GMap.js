@@ -618,7 +618,7 @@ class GMap extends Component {
     this.filterCalendarByTime(dates, hours);
   }
 
-  setSelectedVendor = (selected) => {
+  setSelectedVendor = (selected, cleared) => {
     if(!selected || selected === '') {
       this.setState({
         calendar: this.state.fullCalendar,
@@ -630,20 +630,29 @@ class GMap extends Component {
           // Rerun date filters
           this.filterCalendarByTime(this.state.filteredDates, this.state.filteredHours);
         } else {
-          this.onModalClose();
-          this.setNewBounds(this.state.calendar);
+          if(cleared) {
+            this.onModalClose();
+            this.setNewBounds(this.state.calendar);
+
+            this.props.firebase.analytics.logEvent('search_cleared');
+          }
         }
       });
 
       this.props.firebase.analytics.logEvent('search_cleared');
     } else {
-      // Valid vendor selected
-      this.setState({
-        selected: null,
-        selectedVendor: selected,
-      }, () => this.filterCalendarByVendor(selected.uid));
+      if(typeof selected === 'string') {
+        alert('Vendor not found. Please select vendor from list.')
+      } else {
+        // Valid vendor selected
+        this.setState({
+          selected: null,
+          selectedVendor: selected,
+        }, () => this.filterCalendarByVendor(selected.uid));
 
-      this.props.firebase.analytics.logEvent('search_vendor', { vendor_id: selected.uid, vendor: selected.name });
+        this.props.firebase.analytics.logEvent('search_vendor', { vendor_id: selected.uid, vendor: selected.name });
+
+      }
     }
   }
 
@@ -738,7 +747,7 @@ class GMap extends Component {
               TransitionComponent={Transition}
             >
               <DialogToolbar>
-                <IconButton edge="start" color="inherit" onClick={() => {this.setSelectedVendor(null)} } aria-label="clear search">
+                <IconButton edge="start" color="inherit" onClick={() => { this.setSelectedVendor(null, true) }} aria-label="clear search">
                   <CloseIcon />
                 </IconButton>
                 <Typography variant="h6" id="modal-search-title">
@@ -763,7 +772,7 @@ class GMap extends Component {
                       <Actions onClick={this.onModalClose} fullWidth variant="contained" color="primary">
                         Find Vendor
                       </Actions>
-                      <Actions onClick={() => {this.setSelectedVendor(null)} } fullWidth>
+                      <Actions onClick={() => { this.setSelectedVendor(null, true) }} fullWidth>
                         Clear Search
                       </Actions>
                     </ActionsBar>

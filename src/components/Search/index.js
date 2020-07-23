@@ -23,6 +23,7 @@ export default function VendorSearch(props) {
 
   return (
     <Autocomplete
+      freeSolo
       id="search"
       fullWidth={true}
       options={options}
