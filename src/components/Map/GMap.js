@@ -813,13 +813,13 @@ class GMap extends Component {
                       lat: position.coords.latitude,
                       lng: position.coords.longitude,
                     });
-                    mapRef.setZoom(15);
+                    mapRef.setZoom(12);
                   },
                   () => {
                     this.setState({
                       locationLoading: false,
                     })
-                    alert('We were unable to find your current location.');
+                    alert('Unable to find your current location.');
                   }
                 );
               }}
