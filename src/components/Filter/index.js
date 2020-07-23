@@ -41,7 +41,7 @@ import Container from '@material-ui/core/Container';
 
 const DialogContainer =  withStyles({
   root: {
-    padding: '0 30px',
+    padding: '0 30px 120px',
     maxWidth: 420,
     margin: '0 auto',
   }
