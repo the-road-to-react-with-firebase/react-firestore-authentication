@@ -41,13 +41,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const headerHeight = 48+20;
+const headerHeight = 56;
 const ButtonGrid = styled(Grid)({
   position: 'absolute',
-  top: headerHeight+15,
+  bottom: 8,
   textAlign: 'center',
 });
-const TopButton = styled(IconButton)({
+const NavButton = styled(IconButton)({
   margin: '0 auto',
   display: 'block',
   backgroundColor: (props) =>
@@ -70,6 +70,7 @@ const ButtonText = styled(Typography)({
       : '#555555',
   fontWeight: 500,
   textShadow: '0 0 2px #ebf5fe, 0 0 10px #fff',
+  lineHeight: 1.1,
 });
 
 const DialogContainer = styled(Container)({
@@ -199,7 +200,8 @@ function formatPhoneNumber(phoneNumberString) {
 
 const mapOptions = {
   mapContainerStyle : {
-    height: '100vh',
+    top: headerHeight,
+    height: 'calc(100vh - ' + headerHeight + 'px)',
     width: '100vw',
   },
   center: {
@@ -208,8 +210,8 @@ const mapOptions = {
   },
   zoom: 10,
   options: {
+    disableDefaultUI: true,
     maxZoom: 18.5,
-    mapTypeControl: false,
     gestureHandling: 'greedy',
   }
 }
@@ -478,7 +480,8 @@ class GMap extends Component {
     }
   }
 
-  setNewBounds = (markers) => {
+  setNewBounds = (markers, padding) => {
+    padding = padding || {};
     // Sets map bounds to contain markers
     const bounds = new window.google.maps.LatLngBounds();
     var i = markers.length - 1;
@@ -487,7 +490,11 @@ class GMap extends Component {
       bounds.extend({lat: markers[i].location.latitude, lng: markers[i].location.longitude});
     }
 
-    this.state.mapRef.fitBounds(bounds);
+    this.state.mapRef.fitBounds(bounds, padding);
+  }
+
+  setPan = (offset) => {
+    this.state.mapRef.panBy(0, offset);
   }
 
   setSelected = (marker) => {
@@ -495,7 +502,6 @@ class GMap extends Component {
       this.setState({
         infoLoading: true,
       });
-      this.state.mapRef.panTo({ lat: marker.location.latitude, lng: marker.location.longitude });
 
       // Load vendor details into infoWindow
       const vendor = this.props.firebase
@@ -677,7 +683,7 @@ class GMap extends Component {
       infoData,
       selected,
       selectedVendor,
-      mapRef
+      mapRef,
     } = this.state;
 
     return (
@@ -692,7 +698,9 @@ class GMap extends Component {
             options={mapOptions.options}
             center={mapOptions.center}
             onClick={() => {
-              this.setSelected(null);
+              if(selected){
+                this.setSelected(null);
+              }
             }}
             onLoad={map => this.onMapLoad(map)}
           >
@@ -718,23 +726,23 @@ class GMap extends Component {
                   : <InfoWindowVendor
                       infoData={infoData}
                       firebase={this.props.firebase}
-                      onRender={(height) => {this.state.mapRef.panBy(0, (-height/2 - headerHeight))}}
+                      onRender={(height) => { this.setPan(height) }}
                     />
                 }
               </InfoWindow>
             ) : null}
           </GoogleMap>
         </LoadScript>
-        <ButtonGrid container spacing={3}>
+        <ButtonGrid container spacing={2}>
           <Grid item xs={4} selected>
-            <TopButton
+            <NavButton
               selected={selectedVendor}
               type="button"
               onClick={this.onModalOpen}
               aria-label="Search"
             >
               <SearchIcon />
-            </TopButton>
+            </NavButton>
             <ButtonText selected={selectedVendor}>
             {selectedVendor ? selectedVendor.name : 'Search Vendors' }
             </ButtonText>
@@ -782,16 +790,16 @@ class GMap extends Component {
             </Dialog>
           </Grid>
           <Grid item xs={4}>
-            <TopButton
+            <NavButton
               selected={filterSet}
               type="button"
               onClick={this.onFilterModalOpen}
-              aria-label="Filter by date or time"
+              aria-label="Filter by day or time"
             >
               <EventIcon />
-            </TopButton>
+            </NavButton>
             <ButtonText selected={filterSet}>
-            {filterSet ? 'Filter Applied' : 'Filter by Hours or Days' }
+            {filterSet ? 'Filter Applied' : 'Filter by Day or Time' }
             </ButtonText>
             <Dialog
               fullScreen
@@ -804,7 +812,7 @@ class GMap extends Component {
             </Dialog>
           </Grid>
           <Grid item xs={4}>
-            <TopButton
+            <NavButton
               selected={locationLoading}
               onClick={() => {
                 this.props.firebase.analytics.logEvent('location_detect');
@@ -840,9 +848,9 @@ class GMap extends Component {
                 <MyLocationIcon />
                 )
               }
-            </TopButton>
+            </NavButton>
             <ButtonText selected={locationLoading}>
-            {locationLoading ? 'Finding Location...' : 'Find My Location' }
+            {locationLoading ? 'Finding Location' : 'Find My Location' }
             </ButtonText>
           </Grid>
           <Snackbar

@@ -37,8 +37,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    top: 10,
-    backgroundColor: 'rgba(235, 245, 254, 0.9)',
+    backgroundColor: 'rgba(235, 245, 254, 1)',
     boxShadow: 'none',
   },
   title: {
