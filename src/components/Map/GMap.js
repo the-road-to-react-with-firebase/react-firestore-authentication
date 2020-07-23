@@ -73,7 +73,7 @@ const ButtonText = styled(Typography)({
 });
 
 const DialogContainer = styled(Container)({
-  padding: '0 30px',
+  padding: '0 30px 120px',
 });
 const DialogToolbar = styled(Toolbar)({
   display: 'flex',
