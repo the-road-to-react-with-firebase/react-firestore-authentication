@@ -436,7 +436,6 @@ class GMap extends Component {
         // Vendor search + filter applied
       }
     } else {
-      if(hourResults.length === 1) this.setSelected(hourResults[0]);  
       if(this.state.modalOpen) this.onModalClose();
       if(this.state.filterModalOpen) this.onFilterModalClose();
 
@@ -448,8 +447,8 @@ class GMap extends Component {
         let locationString = hourResults[i].latitude + ',' + hourResults[i].longitude;
         if(locations.indexOf(locationString) === -1) locations.push(locationString);
       }
-      if(locations.length === 1) {
-        // Set selected marker  if there is only one location
+      if(locations.length === 1 && hourResults.length === 1) {
+        // Set selected marker  if there is only one location and filtered result
         this.setSelected(hourResults[0]);
       }
     }
